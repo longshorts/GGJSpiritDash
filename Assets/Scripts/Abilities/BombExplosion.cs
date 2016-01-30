@@ -27,15 +27,8 @@ public class BombExplosion : MonoBehaviour
 			{
 				if(col.transform.gameObject.tag == "Player1")
 				{
-					// Calculate a direction between player and object
-					Vector3 amount = (col.transform.position - transform.position);
-					amount.Normalize();
-					amount *= ExplosionForce;
-
-					Debug.Log (amount);
-
 					// Knockback the player
-					col.transform.gameObject.GetComponent<Player_Control>().Knockback(amount);
+					col.transform.gameObject.GetComponent<Player_Control>().Knockback(transform.position, ExplosionForce);
 				}
 
 				// Calculate a direction vector between the explosion and the collision
