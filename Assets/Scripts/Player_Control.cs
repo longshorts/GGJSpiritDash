@@ -157,7 +157,7 @@ public class Player_Control : MonoBehaviour {
 
 	private IEnumerator HandleKnockback(Vector3 position)
 	{
-		// Freeze player so we can control movement
+		/*// Freeze player so we can control movement
 		isFrozen = true;
 
 		// Grab the current position
@@ -178,7 +178,7 @@ public class Player_Control : MonoBehaviour {
 
 		// Allow player to move again
 		isFrozen = false;
-
+		*/
 		yield return new WaitForEndOfFrame();
 	}
 }
