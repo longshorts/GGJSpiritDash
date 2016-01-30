@@ -15,7 +15,6 @@ public class Player_Control : MonoBehaviour {
 	private KeyCode leftKey;
 	private KeyCode rightKey;
 
-
 	private Animator animator;
 
 	// Movement
@@ -145,40 +144,21 @@ public class Player_Control : MonoBehaviour {
 		}
 	}
 
-	public void Knockback(Vector3 position)
+	public void Knockback(Vector3 position, float force)
 	{
-		StartCoroutine(HandleKnockback(position));
+		// Calculate a direction between player and object
+		Vector3 amount = (transform.position - position);
+		amount.Normalize();
+
+		// Apply force
+		amount *= force;
+
+		// Set new position
+		transform.position = transform.position + amount;
 	}
 
 	public void Freeze(bool Flag)
 	{
 		isFrozen = Flag;
-	}
-
-	private IEnumerator HandleKnockback(Vector3 position)
-	{
-		/*// Freeze player so we can control movement
-		isFrozen = true;
-
-		// Grab the current position
-		Vector3 CurPos;
-
-		// Apply our move amount to our current to find our target
-		Vector3 Target = transform.position + position;
-
-		{
-			// Lerp between current position and target 
-			CurPos = Vector3.Lerp(transform.position, Target, movementSpeed * Time.deltaTime);
-			transform.position = CurPos;
-		}
-
-		// Check if we have finished
-		if(transform.position.Equals(position))
-			break;
-
-		// Allow player to move again
-		isFrozen = false;
-		*/
-		yield return new WaitForEndOfFrame();
 	}
 }
