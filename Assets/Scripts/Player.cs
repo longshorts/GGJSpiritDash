@@ -6,6 +6,7 @@ public class Player
 	public List<Shrine> Objectives;
 	public bool Complete;
 	public float SpiritPower;
+	public bool Victory;
 
 	// GUI HERE
 
