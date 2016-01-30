@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class Player_Control : MonoBehaviour {
 
 	[Header("Properties")]
-	public float movementSpeed = 1.2f;
+	public float movementSpeed = 15f * 1.2f;
 	public int playerNumber;
 	public int numberOfPlayers = 2;
 
@@ -14,6 +14,8 @@ public class Player_Control : MonoBehaviour {
 	private KeyCode downKey;
 	private KeyCode leftKey;
 	private KeyCode rightKey;
+
+	private Animator animator;
 
 	// Movement
 	public Vector2 velocity;
@@ -55,6 +57,8 @@ public class Player_Control : MonoBehaviour {
 			Debug.LogError ("Unknown playerNumber, input not set");
 			break;
 		}
+		
+		this.animator = this.GetComponent<Animator> ();
 	}
 	
 	// Update is called once per frame
@@ -71,7 +75,6 @@ public class Player_Control : MonoBehaviour {
 		// move the character
 		rigidBody.velocity = new Vector3 (velocity.x, 0, velocity.y);
 	}
-	
 
 	private void HandleMovement ()
 	{
@@ -82,24 +85,34 @@ public class Player_Control : MonoBehaviour {
 		float h = Input.GetAxis ("HorizontalLeftAnalogP" + playerNumber);
 		float v = Input.GetAxis ("VerticalLeftAnalogP" + playerNumber);
 
-		velocity.x = movementSpeed * h;
-		velocity.y = movementSpeed * v * -1;
+		velocity.x = h;
+		velocity.y = v * -1;
 
-		if (velocity.x != 0 && velocity.y != 0)
-			return;
+		//velocity = velocity.normalized * movementSpeed;
 
-		if (Input.GetKey (upKey)) {
-			velocity.y = movementSpeed;
+		if (velocity.x == 0 && velocity.y == 0) {
+			if (Input.GetKey (upKey)) {
+				velocity.y = movementSpeed;
+			}
+			if (Input.GetKey (downKey)) {
+				velocity.y = -1 * movementSpeed;
+			}
+			if (Input.GetKey (leftKey)) {
+				velocity.x = -1 * movementSpeed;
+			}
+			if (Input.GetKey (rightKey)) {
+				velocity.x = movementSpeed;
+			}
 		}
-		if (Input.GetKey (downKey)) {
-			velocity.y = -1 * movementSpeed;
+		
+		if (animator != null) {
+			animator.SetFloat ("velocity", Mathf.Sqrt(velocity.x*velocity.x + velocity.y * velocity.y));
 		}
-		if (Input.GetKey (leftKey)) {
-			velocity.x = -1 * movementSpeed;
-		}
-		if (Input.GetKey (rightKey)) {
-			velocity.x = movementSpeed;
-		}
+
+		if(velocity.x != 0 || velocity.y != 0)
+			transform.rotation = Quaternion.Euler (new Vector3(90,0,Mathf.Rad2Deg * Mathf.Atan2 (velocity.y, velocity.x) + 90));
+
+		velocity = velocity.normalized * movementSpeed;
 	}
 
 	private void HandleAbility()
@@ -121,6 +134,7 @@ public class Player_Control : MonoBehaviour {
 			Abilities.Bomb.UseAbility();
 		}
 
+		// LOLHAX
 		if(Input.GetKey(KeyCode.P))
 		{
 			Abilities.Freeze.GrantAbility();
@@ -128,6 +142,19 @@ public class Player_Control : MonoBehaviour {
 			Abilities.Block.GrantAbility();
 			Abilities.Bomb.GrantAbility();
 		}
+	}
+
+	public void Knockback(Vector3 position, float force)
+	{
+		// Calculate a direction between player and object
+		Vector3 amount = (transform.position - position);
+		amount.Normalize();
+
+		// Apply force
+		amount *= force;
+
+		// Set new position
+		transform.position = transform.position + amount;
 	}
 
 	public void Freeze(bool Flag)

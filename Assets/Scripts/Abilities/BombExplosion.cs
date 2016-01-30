@@ -21,17 +21,25 @@ public class BombExplosion : MonoBehaviour
 		// Check for collision
 		if(Physics.Raycast(transform.position, transform.forward, out hit, 1.0f))
 		{
-			Vector3 explosionPos = transform.position;
-			Collider[] colliders = Physics.OverlapSphere(explosionPos, ExplosionRadius);
+			Collider[] colliders = Physics.OverlapSphere(transform.position, ExplosionRadius);
 
 			foreach (Collider col in colliders)
 			{
-				Rigidbody rb = col.GetComponent<Rigidbody>();
-				
-				if (rb != null)
+				if(col.transform.gameObject.tag == "Player1")
 				{
-					rb.AddExplosionForce(ExplosionForce, explosionPos, ExplosionRadius, 3.0F);
+					// Calculate a direction between player and object
+					Vector3 amount = (col.transform.position - transform.position);
+					amount.Normalize();
+					amount *= ExplosionForce;
+
+					Debug.Log (amount);
+
+					// Knockback the player
+					col.transform.gameObject.GetComponent<Player_Control>().Knockback(amount);
 				}
+
+				// Calculate a direction vector between the explosion and the collision
+				// Create a knockback movement to the player based on direction * moveamount
 			}
 			
 			Destroy (gameObject);
