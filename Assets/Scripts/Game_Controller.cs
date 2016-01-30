@@ -5,19 +5,6 @@ using System.Linq;
 
 public class Game_Controller : MonoBehaviour
 {
-	// container for which shrines the player must capture and whether they currently hold them
-	public struct Shrine
-	{
-		public Shrine_Capture Info;
-		public bool Obtained;
-	};
-
-	public struct Player
-	{
-		public List<Shrine> Objectives;
-		public bool Complete;
-	};
-
 	[Header("Game Properties")]
 	public int shrinesRequired = 5;		// shrines required to win
 	public int maxShrines = 12;			// how many shrines in the level
@@ -47,11 +34,10 @@ public class Game_Controller : MonoBehaviour
 		GameObject[] shrine = GameObject.FindGameObjectsWithTag("Shrine");
 
 		// Compile list of shrine capture scripts
-
 		LevelShrines = new List<Shrine>();
 		foreach(GameObject obj in shrine)
 		{
-			Shrine temp;
+			Shrine temp = new Shrine();
 			temp.Info = obj.GetComponent<Shrine_Capture>();
 			temp.Obtained = false;
 			LevelShrines.Add(temp);

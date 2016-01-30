@@ -71,7 +71,6 @@ public class Player_Control : MonoBehaviour {
 		// move the character
 		rigidBody.velocity = new Vector3 (velocity.x, 0, velocity.y);
 	}
-	
 
 	private void HandleMovement ()
 	{
@@ -121,6 +120,7 @@ public class Player_Control : MonoBehaviour {
 			Abilities.Bomb.UseAbility();
 		}
 
+		// LOLHAX
 		if(Input.GetKey(KeyCode.P))
 		{
 			Abilities.Freeze.GrantAbility();
@@ -130,8 +130,41 @@ public class Player_Control : MonoBehaviour {
 		}
 	}
 
+	public void Knockback(Vector3 position)
+	{
+		StartCoroutine(HandleKnockback(position));
+	}
+
 	public void Freeze(bool Flag)
 	{
 		isFrozen = Flag;
+	}
+
+	private IEnumerator HandleKnockback(Vector3 position)
+	{
+		// Freeze player so we can control movement
+		isFrozen = true;
+
+		// Grab the current position
+		Vector3 CurPos;
+
+		// Apply our move amount to our current to find our target
+		Vector3 Target = transform.position + position;
+
+		while(true)
+		{
+			// Lerp between current position and target 
+			CurPos = Vector3.Lerp(transform.position, Target, movementSpeed * Time.deltaTime);
+			transform.position = CurPos;
+		}
+
+		// Check if we have finished
+		if(transform.position.Equals(position))
+			break;
+
+		// Allow player to move again
+		isFrozen = false;
+
+		yield return new WaitForEndOfFrame();
 	}
 }
