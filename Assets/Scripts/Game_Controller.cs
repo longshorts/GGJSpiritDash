@@ -71,14 +71,14 @@ public class Game_Controller : MonoBehaviour
 		for(int i = 0; i < PlayerOne.Objectives.Count; i++)
 		{
 			// Set its obtained if its owned by player one
-			PlayerOne.Objectives.ToArray()[i].Obtained = PlayerOne.Objectives[i].Info.player1Control;
+			PlayerOne.Objectives.ToArray()[i].Obtained = PlayerOne.Objectives[i].Info.CheckOwner(Shrine_Capture.CaptureState.PLAYERONE);
 		}
 		
 		// Check each shrine in player two objectives
 		for(int i = 0; i < PlayerTwo.Objectives.Count; i++)
 		{
 			// Set its obtained if its owned by player two
-			PlayerTwo.Objectives.ToArray()[i].Obtained = PlayerTwo.Objectives[i].Info.player2Control;
+			PlayerTwo.Objectives.ToArray()[i].Obtained = PlayerTwo.Objectives[i].Info.CheckOwner(Shrine_Capture.CaptureState.PLAYERTWO);
 		}
 	}
 

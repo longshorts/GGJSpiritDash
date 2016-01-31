@@ -9,7 +9,7 @@ public class TileBlender : MonoBehaviour
 	public Texture NeutralTexture;
 
 	[Header("Properties")]
-	public float BlendSpeed;
+	public float BlendSpeed = 1.0f;
 
 	public bool IsBlending;
 	private float BlendAmount;
@@ -28,6 +28,10 @@ public class TileBlender : MonoBehaviour
 
 		// Set initial blend amount
 		ObjMaterial.SetFloat("_BlendAmount", 0.0f);
+
+		// Update texture
+		ObjMaterial.SetTexture("_MainTex", NeutralTexture);
+		ObjMaterial.SetTexture("_BlendTex", NeutralTexture);
 	}
 
 	void Update ()
