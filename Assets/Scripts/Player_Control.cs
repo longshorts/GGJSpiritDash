@@ -34,6 +34,12 @@ public class Player_Control : MonoBehaviour {
 
 	private AbilityController Abilities;
 
+	public AudioClip blockSound;
+	public AudioClip bombSound;
+	public AudioClip dashSound;
+	public AudioClip freezeSound;
+	private AudioSource audio;
+
 	void Start ()
 	{
 		// assign the character rigid body to this movement script
@@ -44,6 +50,8 @@ public class Player_Control : MonoBehaviour {
 		Abilities = gameObject.AddComponent<AbilityController>();
 
 		isFrozen = false;
+
+		audio = GetComponent<AudioSource> ();
 	}
 
 	private void AssignInput()
@@ -147,22 +155,27 @@ public class Player_Control : MonoBehaviour {
 		{
 			if (playerNumber == 1){
 				Abilities.Freeze.UseAbility(Abilities.PlayerTwo);
+				audio.PlayOneShot(freezeSound, 0.7f);
 			} else if (playerNumber == 2){
 				Abilities.Freeze.UseAbility(Abilities.PlayerOne);
+				audio.PlayOneShot(freezeSound, 0.7f);
 			}
 
 		}
 		if(Input.GetKeyDown(DashKey) | Input.GetKeyDown(DashButton))
 		{
 			Abilities.Dash.UseAbility();
+			audio.PlayOneShot(dashSound, 0.7f);
 		}
 		if(Input.GetKeyDown(BlockKey) | Input.GetKeyDown(BlockButton))
 		{
 			Abilities.Block.UseAbility();
+			audio.PlayOneShot(blockSound, 0.7f);
 		}
 		if(Input.GetKeyDown(BombKey) | Input.GetKeyDown(BombButton))
 		{
 			Abilities.Bomb.UseAbility();
+			audio.PlayOneShot(bombSound, 0.7f);
 		}
 
 		// LOLHAX

@@ -29,6 +29,9 @@ public class Shrine : MonoBehaviour
 	private Material material;
 	private int ID = 0;
 
+	public AudioClip shrineSound;
+	private AudioSource audio;
+
 	// Use this for initialization
 	void Start ()
 	{
@@ -51,6 +54,7 @@ public class Shrine : MonoBehaviour
 		PlayerTwoTex = ConvertToTexture(PlayerTwoCaptured);
 
 		UpdateShader(UncapturedTex);
+		audio = GetComponent<AudioSource> ();
 	}
 
 	private void UpdateOwner()
@@ -70,6 +74,7 @@ public class Shrine : MonoBehaviour
 		if(Check)
 		{
 			ownerState = CaptureState.PLAYERONE;
+			audio.PlayOneShot(shrineSound, 0.6f);
 			UpdateShader (PlayerOneTex);
 		}
 
@@ -78,6 +83,7 @@ public class Shrine : MonoBehaviour
 		if(Check)
 		{
 			ownerState = CaptureState.PLAYERTWO;
+			audio.PlayOneShot(shrineSound, 0.6f);
 			UpdateShader (PlayerTwoTex);
 		}
 				
