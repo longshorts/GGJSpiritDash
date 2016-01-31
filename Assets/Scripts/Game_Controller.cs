@@ -14,11 +14,14 @@ public class Game_Controller : MonoBehaviour
 	public Player PlayerOne;
 	public Player PlayerTwo;
 	public List<Shrine> LevelShrines;	// array of references to shrine scripts
+
+	private Scene_transition sceneTransition;
 	
 	void Start ()
 	{
 		// initialize game state variables
 		GameRunning = false;
+		sceneTransition = GetComponent<Scene_transition> ();
 
 		// Initialise Players
 		PlayerOne = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
@@ -45,15 +48,22 @@ public class Game_Controller : MonoBehaviour
 			GameRunning = true;
 		}
 
-		// If the game has been complete then stop
+		/*// If the game has been complete then stop
 		if(PlayerOne.Complete || PlayerTwo.Complete)
 		{
 			// Start Portal
 			return;
-		}
+		}*/
 
 		// check whether the player controls all of their shrines
 		CheckProgress ();
+
+		if (PlayerOne.Victory) {
+			sceneTransition.end_game (true);
+		} else if (PlayerTwo.Victory){
+			Debug.Log ("gotoendscreen");
+			sceneTransition.end_game (false);
+		}
 	}
 
 	void CheckProgress()
@@ -64,11 +74,11 @@ public class Game_Controller : MonoBehaviour
 
 		if(PlayerOne.Complete)
 		{
-			Debug.Log ("Player One Wins");
+			Debug.Log ("Player One collected all shrines");
 		}
 		else if(PlayerTwo.Complete)
 		{
-			Debug.Log ("Player Two Wins!");
+			Debug.Log ("Player Two collected all shrines");
 		}
 		else if(PlayerOne.Complete && PlayerTwo.Complete)
 		{

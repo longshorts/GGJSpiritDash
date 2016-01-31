@@ -102,13 +102,13 @@ public class Shrine : MonoBehaviour
 
 		if (other.gameObject.tag == "Player1")
 		{
-			captureProgress -= conversionSpeed * Time.deltaTime;
+			captureProgress += conversionSpeed * Time.deltaTime;
 			Clamp(ref captureProgress, -150, 150);
 			UpdateOwner();
 		}
 		else if (other.gameObject.tag == "Player2")
 		{	
-			captureProgress += conversionSpeed * Time.deltaTime;
+			captureProgress -= conversionSpeed * Time.deltaTime;
 			Clamp(ref captureProgress, -150, 150);
 			UpdateOwner();
 		}

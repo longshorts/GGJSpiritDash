@@ -7,12 +7,15 @@ public class BombAbility : MonoBehaviour
 	public GameObject BombPrefab;
 	public float BombSpeed = 15.0f;
 	public float CooldownDuration = 10.0f;
+	public float bombDist;
 	
 	[Header("Usability")]
-	public bool HasAbility = false;
-	public bool CanUseAbility = false;
+	public bool HasAbility = true;
+	public bool CanUseAbility = true;
 	
 	private Player_Control Player;
+	private Vector3 bombCalc;
+	private Vector3 heading;
 	
 	void Start()
 	{
@@ -49,9 +52,11 @@ public class BombAbility : MonoBehaviour
 		CanUseAbility = false;
 
 		// Throw the bomb
-		GameObject Bomb = (GameObject)Instantiate(BombPrefab, transform.position + transform.forward, new Quaternion()) as GameObject;
+		bombCalc = transform.position + (bombDist * new Vector3 (Player.velocity.x, 0, Player.velocity.y));
+		GameObject Bomb = (GameObject)Instantiate(BombPrefab, bombCalc, new Quaternion (0, 1, 0, 0)) as GameObject;
 		Bomb.name = "Thrown Bomb";
-		Bomb.GetComponent<Rigidbody>().velocity = gameObject.transform.forward * BombSpeed;
+		heading = new Vector3 (Player.velocity.x, 0, Player.velocity.y);
+		Bomb.GetComponent<Rigidbody>().velocity = heading * BombSpeed;
 
 		Debug.Log ("Fire in the hole!");
 

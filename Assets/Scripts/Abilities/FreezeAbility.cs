@@ -49,7 +49,7 @@ public class FreezeAbility : MonoBehaviour
 	{
 		// Freeze the Player
 		Debug.Log ("Freeze motherfucker!");
-		Target.GetComponent<Player_Control>().Freeze(true);
+		Target.GetComponent<Player_Control>().FreezeSolid(true);
 
 		// Wait for unfreeze
 		yield return new WaitForSeconds(FreezeDuration);

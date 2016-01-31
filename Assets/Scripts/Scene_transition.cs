@@ -4,6 +4,19 @@ using System.Collections;
 public class Scene_transition : MonoBehaviour {
 
 	public void transition() {
-		Application.LoadLevel (11);
+		if (Application.loadedLevelName == ("SplashScreen")) {
+
+			Application.LoadLevel ("TheMainLevel");
+		} else {
+			Application.LoadLevel ("SplashScreen");
+		}
+	}
+
+	public void end_game(bool p1) {
+		if (p1) {
+			Application.LoadLevel ("P1EndScreen");
+		} else {
+			Application.LoadLevel ("P2EndScreen");
+		}
 	}
 }

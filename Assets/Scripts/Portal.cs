@@ -40,8 +40,5 @@ public class Portal : MonoBehaviour {
 			gameController.PlayerTwo.Victory = true;
 			print ("victory for Player 2");
 		}
-
-
-
 	}
 }

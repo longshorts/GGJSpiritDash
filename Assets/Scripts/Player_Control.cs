@@ -15,6 +15,16 @@ public class Player_Control : MonoBehaviour {
 	private KeyCode leftKey;
 	private KeyCode rightKey;
 
+	private KeyCode FreezeKey;
+	private KeyCode BlockKey;
+	private KeyCode DashKey;
+	private KeyCode BombKey;
+
+	private KeyCode FreezeButton;
+	private KeyCode BlockButton;
+	private KeyCode DashButton;
+	private KeyCode BombButton;
+
 	private Animator animator;
 
 	// Movement
@@ -45,12 +55,28 @@ public class Player_Control : MonoBehaviour {
 			downKey = KeyCode.S;
 			leftKey = KeyCode.A;
 			rightKey = KeyCode.D;
+			FreezeKey = KeyCode.Alpha1;
+			DashKey = KeyCode.Alpha2;
+			BlockKey = KeyCode.Alpha3;
+			BombKey = KeyCode.Alpha4;
+			FreezeButton = KeyCode.Joystick1Button0;
+			DashButton = KeyCode.Joystick1Button1;
+			BlockButton = KeyCode.Joystick1Button2;
+			BombButton = KeyCode.Joystick1Button3;
 			break;
 		case 2:
 			upKey = KeyCode.UpArrow;
 			downKey = KeyCode.DownArrow;
 			leftKey = KeyCode.LeftArrow;
 			rightKey = KeyCode.RightArrow;
+			FreezeKey = KeyCode.Alpha9;
+			DashKey = KeyCode.Alpha0;
+			BlockKey = KeyCode.Minus;
+			BombKey = KeyCode.Equals;
+			FreezeButton = KeyCode.Joystick2Button0;
+			DashButton = KeyCode.Joystick2Button1;
+			BlockButton = KeyCode.Joystick2Button2;
+			BombButton = KeyCode.Joystick2Button3;
 			break;
 			
 		default:
@@ -117,19 +143,24 @@ public class Player_Control : MonoBehaviour {
 
 	private void HandleAbility()
 	{
-		if(Input.GetKeyDown(KeyCode.Alpha1))
+		if(Input.GetKeyDown(FreezeKey) | Input.GetKeyDown(FreezeButton))
 		{
-			Abilities.Freeze.UseAbility(Abilities.PlayerTwo);
+			if (playerNumber == 1){
+				Abilities.Freeze.UseAbility(Abilities.PlayerTwo);
+			} else if (playerNumber == 2){
+				Abilities.Freeze.UseAbility(Abilities.PlayerOne);
+			}
+
 		}
-		if(Input.GetKeyDown(KeyCode.Alpha2))
+		if(Input.GetKeyDown(DashKey) | Input.GetKeyDown(DashButton))
 		{
 			Abilities.Dash.UseAbility();
 		}
-		if(Input.GetKeyDown(KeyCode.Alpha3))
+		if(Input.GetKeyDown(BlockKey) | Input.GetKeyDown(BlockButton))
 		{
 			Abilities.Block.UseAbility();
 		}
-		if(Input.GetKeyDown(KeyCode.Alpha4))
+		if(Input.GetKeyDown(BombKey) | Input.GetKeyDown(BombButton))
 		{
 			Abilities.Bomb.UseAbility();
 		}
@@ -154,11 +185,19 @@ public class Player_Control : MonoBehaviour {
 		amount *= force;
 
 		// Set new position
+		// will trap player in the wall
+		// feature?
 		transform.position = transform.position + amount;
 	}
 
 	public void Freeze(bool Flag)
 	{
 		isFrozen = Flag;
+	}
+
+	public void FreezeSolid(bool Flag)
+	{
+		isFrozen = Flag;
+		rigidBody.velocity = new Vector3 (0, 0, 0);
 	}
 }

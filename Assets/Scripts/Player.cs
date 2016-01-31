@@ -17,6 +17,7 @@ public class Player : MonoBehaviour
 		SpiritPower = 0.0f;
 		Objectives = new List<Shrine>();
 		Complete = false;
+		Victory = false;
 
 		UpdateGUI ();
 	}

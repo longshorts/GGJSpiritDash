@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class DashAbility : MonoBehaviour
 {
@@ -16,6 +17,8 @@ public class DashAbility : MonoBehaviour
 	public Vector3 DashTargetLocation;
 
 	private Player_Control Player;
+	private RaycastHit hit;
+	private Ray ray;
 
 	void Start()
 	{
@@ -50,6 +53,49 @@ public class DashAbility : MonoBehaviour
 			StartCoroutine(Cooldown());
 		}
 	}
+
+	bool CheckLocation () {
+
+		ray.origin = transform.position;
+		Vector3 facing = new Vector3 (Player.velocity.x, 0, Player.velocity.y);
+		facing = facing.normalized;
+		ray.direction = facing;
+		Debug.DrawRay(ray.origin, (DashAmount * facing), Color.green, 30.0f,false);
+		
+		if (Physics.Raycast (ray, out hit, 20.0f)) {
+
+			if (!hit.collider.isTrigger)
+			{
+				if (hit.distance < 4.0f)
+				{
+					ray.origin = transform.position + (DashAmount * new Vector3 (Player.velocity.x, 0, Player.velocity.y));
+					Vector3 facing2 = new Vector3 (Player.velocity.x, 0, Player.velocity.y);
+					facing2 = facing2.normalized;
+					ray.direction = facing;
+					
+					if (Physics.Raycast (ray, out hit, 11.0f)) {	// change this float for being able to jump across small obstacles(go lower) - will get stuck in large obstacles
+
+						if (!hit.collider.isTrigger)
+						{
+							Debug.Log ("Wall in the way");
+							return false;
+						} else {
+							return true;
+						}
+					}
+				} else if (hit.distance < 16.0f) {
+					Debug.Log ("Wall in the way");
+					return false;
+				}
+
+			} else {
+				return true;
+			}
+		}
+
+		return true;
+
+	}
 	
 	public void UseAbility ()
 	{
@@ -71,6 +117,10 @@ public class DashAbility : MonoBehaviour
 			return;
 		}
 
+		if (!CheckLocation ()) {
+			return;
+		}
+
 		// Freeze controls
 		Player.Freeze(true);
 
@@ -78,11 +128,14 @@ public class DashAbility : MonoBehaviour
 		IsDashing = true;
 		CanUseAbility = false;
 
+		DashTargetLocation = transform.position + (DashAmount * new Vector3 (Player.velocity.x, 0, Player.velocity.y));
+		/*
 		// Calculate how much to move
 		Vector3 MoveAmount = this.gameObject.transform.forward * DashAmount;
 
 		// Calculate our new target position
 		DashTargetLocation = transform.position + MoveAmount;
+		*/
 	}
 
 	private IEnumerator Cooldown()

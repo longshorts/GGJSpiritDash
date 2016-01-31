@@ -8,13 +8,17 @@ public class BlockAbility : MonoBehaviour
 	public GameObject BlockPrefab;
 	public float CooldownDuration = 10.0f;
 	public float BlockDuration = 5.0f;
-	
+	public float blockDist;
+
 	[Header("Usability")]
-	public bool HasAbility = false;
-	public bool CanUseAbility = false;
+	public bool HasAbility = true;
+	public bool CanUseAbility = true;
 	
 	private Player_Control Player;
 	private GameObject Block;
+	private Transform blockLocation;
+	private Vector3 blockCalc;
+
 	
 	void Start()
 	{
@@ -46,15 +50,16 @@ public class BlockAbility : MonoBehaviour
 			Debug.Log ("Cannot use ability");
 			return;
 		}
-		
-		// Flag we are now dashing and cannot do so again yet
-		CanUseAbility = false;
+		if ((Player.velocity.x > 0) | (Player.velocity.y > 0)) {
+			// Flag we are now dashing and cannot do so again yet
+			CanUseAbility = false;
 
-		// Start Cooldown
-		StartCoroutine(Cooldown());
+			// Start Cooldown
+			StartCoroutine (Cooldown ());
 
-		// Place Block
-		StartCoroutine(BlockPlacement());
+			// Place Block
+			StartCoroutine (BlockPlacement ());
+		}
 	}
 	
 	private IEnumerator Cooldown()
@@ -65,11 +70,13 @@ public class BlockAbility : MonoBehaviour
 
 	private IEnumerator BlockPlacement()
 	{
-		Block = (GameObject)Instantiate(BlockPrefab, transform.position, new Quaternion()) as GameObject;
-		Block.name = "Placed Block";
+		blockCalc = transform.position - (blockDist * new Vector3 (Player.velocity.x, 0, Player.velocity.y));
+		Block = (GameObject)Instantiate (BlockPrefab, blockCalc, new Quaternion (0, 1, 0, 0)) as GameObject;
+		Block.name = "Placed Block"; 
 
 		// Wait for x seconds
-		yield return new WaitForSeconds(BlockDuration);
+		yield return new WaitForSeconds (BlockDuration);
+		
 
 		// If we have a block still, destroy it
 		if(Block)
