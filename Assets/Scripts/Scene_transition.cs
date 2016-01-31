@@ -19,4 +19,14 @@ public class Scene_transition : MonoBehaviour {
 			Application.LoadLevel ("P2EndScreen");
 		}
 	}
+
+	public void help() {
+
+		Application.LoadLevel ("HelpScreen");
+	}
+
+	public void credits() {
+		
+		Application.LoadLevel ("Credits");
+	}
 }
