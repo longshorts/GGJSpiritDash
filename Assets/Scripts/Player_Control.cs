@@ -44,6 +44,7 @@ public class Player_Control : MonoBehaviour {
 		Abilities = gameObject.AddComponent<AbilityController>();
 
 		isFrozen = false;
+		animator.SetBool ("isFrozen", isFrozen);
 	}
 
 	private void AssignInput()
@@ -90,6 +91,8 @@ public class Player_Control : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
 	{
+		animator.SetBool ("isFrozen", isFrozen);
+
 		// If we are frozen we cant move
 		if(isFrozen)
 			return;
@@ -193,11 +196,13 @@ public class Player_Control : MonoBehaviour {
 	public void Freeze(bool Flag)
 	{
 		isFrozen = Flag;
+		//animator.SetBool ("isFrozen", isFrozen);
 	}
 
 	public void FreezeSolid(bool Flag)
 	{
 		isFrozen = Flag;
 		rigidBody.velocity = new Vector3 (0, 0, 0);
+
 	}
 }
