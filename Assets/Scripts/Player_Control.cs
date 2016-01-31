@@ -32,6 +32,8 @@ public class Player_Control : MonoBehaviour {
 	public bool isFrozen;
 	private Rigidbody rigidBody;
 
+	public Vector3 DirectionVector;
+
 	private AbilityController Abilities;
 
 	public AudioClip blockSound;
@@ -52,7 +54,9 @@ public class Player_Control : MonoBehaviour {
 		isFrozen = false;
 		animator.SetBool ("isFrozen", isFrozen);
 
+
 		audio = GetComponent<AudioSource> ();
+		DirectionVector = new Vector3 (0, 0, -1);
 	}
 
 	private void AssignInput()
@@ -150,6 +154,8 @@ public class Player_Control : MonoBehaviour {
 			transform.rotation = Quaternion.Euler (new Vector3(90,0,Mathf.Rad2Deg * Mathf.Atan2 (velocity.y, velocity.x) + 90));
 
 		velocity = velocity.normalized * movementSpeed;
+
+		CalculateDirectionVector ();
 	}
 
 	private void HandleAbility()
@@ -189,6 +195,18 @@ public class Player_Control : MonoBehaviour {
 			Abilities.Block.GrantAbility();
 			Abilities.Bomb.GrantAbility();
 		}
+	}
+
+	private void CalculateDirectionVector()
+	{
+		if (velocity.x + velocity.y == 0)
+			return;
+
+		// Create a target
+		Vector3 Target = transform.position + new Vector3 (velocity.x, 0, velocity.y);
+
+		DirectionVector = Target - transform.position;
+		DirectionVector.Normalize ();
 	}
 
 	public void Knockback(Vector3 position, float force)

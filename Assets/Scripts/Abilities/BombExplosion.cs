@@ -13,16 +13,21 @@ public class BombExplosion : MonoBehaviour
 	public AudioClip explodeSound;
 	private AudioSource audio;
 
+	private Animator animator;
+
 	// Use this for initialization
 	void Start ()
 	{
 		rigidBody = GetComponent<Rigidbody>();
 		audio = GetComponent<AudioSource> (); 
+		this.animator = this.GetComponent<Animator> ();
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
+
+
 		// Check for collision
 		if(Physics.Raycast(transform.position, rigidBody.velocity.normalized, out hit, 1.0f))
 		{

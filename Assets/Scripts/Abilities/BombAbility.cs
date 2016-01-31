@@ -52,11 +52,10 @@ public class BombAbility : MonoBehaviour
 		CanUseAbility = false;
 
 		// Throw the bomb
-		bombCalc = transform.position + (bombDist * new Vector3 (Player.velocity.x, 0, Player.velocity.y));
-		GameObject Bomb = (GameObject)Instantiate(BombPrefab, bombCalc, new Quaternion (0, 1, 0, 0)) as GameObject;
+		bombCalc = transform.position + (Player.DirectionVector * 2);
+		GameObject Bomb = (GameObject)Instantiate(BombPrefab, bombCalc, Quaternion.Euler(new Vector3(90,0,0))) as GameObject;
 		Bomb.name = "Thrown Bomb";
-		heading = new Vector3 (Player.velocity.x, 0, Player.velocity.y);
-		Bomb.GetComponent<Rigidbody>().velocity = heading * BombSpeed;
+		Bomb.GetComponent<Rigidbody>().velocity = Player.DirectionVector * BombSpeed;
 
 		Debug.Log ("Fire in the hole!");
 
