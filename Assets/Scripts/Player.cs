@@ -33,7 +33,7 @@ public class Player : MonoBehaviour
 			return;
 
 		// Loop through and get the sprite
-		for(int i = 0; i < 5; i++)
+		for(int i = 0; i < ObjectivesUI.Length; i++)
 		{
 			ObjectivesUI[i].sprite = GetSprite(i);
 		}
@@ -44,7 +44,29 @@ public class Player : MonoBehaviour
 		if(Objectives.Count == 0)
 			return null;
 
-		// We own it so set image as highlighted
+		// Uncaptured
+		if(Objectives[i].owner == null)
+		{
+			return Objectives[i].Uncaptured;
+		}
+
+		// If we own it then update to our colour version
+		if(Objectives[i].owner.Equals(this.gameObject))
+		{
+			// We are the owner
+			if(gameObject.tag == "Player1")
+			{
+				// We own it so set image as highlighted
+				return Objectives[i].PlayerOneCaptured;
+			}
+			else
+			{
+				// We don't own it so set to other player
+				return Objectives[i].PlayerTwoCaptured;
+			}
+		}
+
+		// We shouldnt make it here
 		return Objectives[i].Uncaptured;
 	}
 }

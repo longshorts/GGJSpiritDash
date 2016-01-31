@@ -39,8 +39,8 @@ public class Shrine : MonoBehaviour
 		ownerState = CaptureState.UNCAPTURED;
 
 		// Find objects
-		PlayerOne = GameObject.Find ("Player1");
-		PlayerTwo = GameObject.Find ("Player2");
+		PlayerOne = GameObject.FindGameObjectWithTag("Player1");
+		PlayerTwo = GameObject.FindGameObjectWithTag("Player2");
 
 		// Access material
 		material = GetComponent<Renderer>().material;
