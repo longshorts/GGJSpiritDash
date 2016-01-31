@@ -10,15 +10,20 @@ public class BombExplosion : MonoBehaviour
 	private Rigidbody rigidBody;
 	private RaycastHit hit;
 
+	private Animator animator;
+
 	// Use this for initialization
 	void Start ()
 	{
 		rigidBody = GetComponent<Rigidbody>();
+		this.animator = this.GetComponent<Animator> ();
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
+
+
 		// Check for collision
 		if(Physics.Raycast(transform.position, rigidBody.velocity.normalized, out hit, 1.0f))
 		{
