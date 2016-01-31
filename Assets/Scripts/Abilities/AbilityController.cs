@@ -4,8 +4,8 @@ using System.Collections;
 public class AbilityController : MonoBehaviour
 {
 	[Header("Properties")]
-	public string PlayerOneName = "PlayerCharacter1";
-	public string PlayerTwoName = "PlayerCharacter2";
+	public string PlayerOneTag = "Player1";
+	public string PlayerTwoTag = "Player2";
 
 	public GameObject PlayerOne;
 	public GameObject PlayerTwo;
@@ -18,8 +18,8 @@ public class AbilityController : MonoBehaviour
 
 	void Start()
 	{
-		PlayerOne = GameObject.Find (PlayerOneName);
-		PlayerTwo = GameObject.Find (PlayerTwoName);
+		PlayerOne = GameObject.Find (PlayerOneTag);
+		PlayerTwo = GameObject.Find (PlayerTwoTag);
 
 		// Add Abilities
 		Freeze = this.gameObject.GetComponent<FreezeAbility>();
