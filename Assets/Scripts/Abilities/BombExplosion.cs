@@ -10,10 +10,14 @@ public class BombExplosion : MonoBehaviour
 	private Rigidbody rigidBody;
 	private RaycastHit hit;
 
+	public AudioClip explodeSound;
+	private AudioSource audio;
+
 	// Use this for initialization
 	void Start ()
 	{
 		rigidBody = GetComponent<Rigidbody>();
+		audio = GetComponent<AudioSource> (); 
 	}
 	
 	// Update is called once per frame
@@ -28,6 +32,7 @@ public class BombExplosion : MonoBehaviour
 			{
 				if((col.transform.gameObject.tag == "Player1") | (col.transform.gameObject.tag == "Player2"))
 				{
+					audio.PlayOneShot(explodeSound, 0.7f);
 					// Knockback the player
 					col.transform.gameObject.GetComponent<Player_Control>().Knockback(transform.position, ExplosionForce);
 				}
