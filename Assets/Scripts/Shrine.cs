@@ -66,7 +66,10 @@ public class Shrine : MonoBehaviour
 		if(Check)
 		{
 			ownerState = CaptureState.UNCAPTURED;
+			owner = null;
 			UpdateShader (UncapturedTex);
+			
+			return;
 		}
 
 		// Check for player one
@@ -74,8 +77,15 @@ public class Shrine : MonoBehaviour
 		if(Check)
 		{
 			ownerState = CaptureState.PLAYERONE;
-			audio.PlayOneShot(shrineSound, 0.6f);
+			owner = PlayerOne;
+
+			if(!audio.isPlaying)
+			{
+				audio.PlayOneShot(shrineSound, 0.6f);
+			}
 			UpdateShader (PlayerOneTex);
+			
+			return;
 		}
 
 		// Check for player two
@@ -83,29 +93,19 @@ public class Shrine : MonoBehaviour
 		if(Check)
 		{
 			ownerState = CaptureState.PLAYERTWO;
-			audio.PlayOneShot(shrineSound, 0.6f);
+			owner = PlayerTwo;
+			if(!audio.isPlaying)
+			{
+				audio.PlayOneShot(shrineSound, 0.6f);
+			}
 			UpdateShader (PlayerTwoTex);
-		}
-				
-		switch(ownerState)
-		{
-			case CaptureState.UNCAPTURED:
-				owner = null;
-				break;
 
-			case CaptureState.PLAYERONE:
-				owner = PlayerOne;
-				break;
-
-			case CaptureState.PLAYERTWO:
-				owner = PlayerTwo;
-				break;
+			return;
 		}
 	}
 
 	void OnTriggerStay(Collider other)
 	{
-
 		if (other.gameObject.tag == "Player1")
 		{
 			captureProgress += conversionSpeed * Time.deltaTime;

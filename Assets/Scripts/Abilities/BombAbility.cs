@@ -12,14 +12,13 @@ public class BombAbility : MonoBehaviour
 	[Header("Usability")]
 	public bool HasAbility = true;
 	public bool CanUseAbility = true;
-	
-	private Player_Control Player;
-	private Vector3 bombCalc;
-	private Vector3 heading;
+
+	[Header("Access")]
+	public PlayerController playerController;
 	
 	void Start()
 	{
-		Player = GetComponent<Player_Control>();
+		playerController = gameObject.GetComponent<PlayerController>();
 	}
 	
 	public void GrantAbility()
@@ -52,10 +51,8 @@ public class BombAbility : MonoBehaviour
 		CanUseAbility = false;
 
 		// Throw the bomb
-		bombCalc = transform.position + (Player.DirectionVector * 2);
-		GameObject Bomb = (GameObject)Instantiate(BombPrefab, bombCalc, Quaternion.Euler(new Vector3(90,0,0))) as GameObject;
-		Bomb.name = "Thrown Bomb";
-		Bomb.GetComponent<Rigidbody>().velocity = Player.DirectionVector * BombSpeed;
+		GameObject CreatedBomb = (GameObject)Instantiate(BombPrefab, transform.position + (playerController.DirectionVector * 3), Quaternion.Euler(new Vector3(90,0,0))) as GameObject;
+		CreatedBomb.GetComponent<Bomb>().Initialise(playerController.DirectionVector, BombSpeed);
 
 		Debug.Log ("Fire in the hole!");
 

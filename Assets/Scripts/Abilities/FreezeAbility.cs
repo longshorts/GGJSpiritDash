@@ -47,15 +47,17 @@ public class FreezeAbility : MonoBehaviour
 
 	private IEnumerator FreezePlayer(GameObject Target)
 	{
+		CanUseAbility = false;
+
 		// Freeze the Player
 		Debug.Log ("Freeze motherfucker!");
-		Target.GetComponent<Player_Control>().FreezeSolid(true);
+		Target.GetComponent<PlayerController>().Freeze(true);
 
 		// Wait for unfreeze
 		yield return new WaitForSeconds(FreezeDuration);
 
 		// Unfreeze player
-		Target.GetComponent<Player_Control>().Freeze (false);
+		Target.GetComponent<PlayerController>().Freeze (false);
 		Debug.Log ("Get your head into the game!");
 
 		// Start Cooldown
