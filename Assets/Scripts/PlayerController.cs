@@ -213,8 +213,6 @@ public class PlayerController : MonoBehaviour
 
 		// Reformat to Local
 		LocalDirectionVector = new Vector3(DirectionVector.x, DirectionVector.z, 0.0f);
-
-		Debug.Log ("Direction : " + DirectionVector);
 	}
 
 	public void Knockback(Vector3 position, float force)

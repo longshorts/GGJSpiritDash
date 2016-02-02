@@ -51,11 +51,14 @@ public class GameController : MonoBehaviour
 		// check whether the player controls all of their shrines
 		CheckProgress ();
 
-		if (PlayerOne.Victory) {
-			sceneTransition.end_game (true);
-		} else if (PlayerTwo.Victory){
+		if (PlayerOne.Victory)
+		{
+			sceneTransition.EndGame (true);
+		}
+		else if (PlayerTwo.Victory)
+		{
 			Debug.Log ("gotoendscreen");
-			sceneTransition.end_game (false);
+			sceneTransition.EndGame (false);
 		}
 	}
 
@@ -87,7 +90,8 @@ public class GameController : MonoBehaviour
 		{
 			if(shrine.ownerState == state)
 			{
-				Count++;
+				if(shrine.IsCaptured())
+					Count++;
 			}
 		}
 		
@@ -105,23 +109,11 @@ public class GameController : MonoBehaviour
 		// Take the number of shrines we need
 		Shrine[] PlayerOneShrines = LevelShrines.Take(shrinesRequired).ToArray();
 
-		Debug.Log ("Player One--");
-		foreach(Shrine shrine in PlayerOneShrines)
-		{
-			Debug.Log (shrine.name);
-		}
-
 		// Shuffle the list
 		LevelShrines.Shuffle();
 
 		// Take the number of shrines we need
 		Shrine[] PlayerTwoShrines = LevelShrines.Take(shrinesRequired).ToArray();
-
-		Debug.Log ("Player Two--");
-		foreach(Shrine shrine in PlayerTwoShrines)
-		{
-			Debug.Log (shrine.name);
-		}
 
 		// Give the objectives to the player
 		AllocateShrinesToPlayer(ref PlayerOne, PlayerOneShrines);

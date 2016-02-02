@@ -57,12 +57,25 @@ public class Player : MonoBehaviour
 			if(gameObject.tag == "Player1")
 			{
 				// We own it so set image as highlighted
-				return Objectives[i].PlayerOneCaptured;
+				if(Objectives[i].captureProgress <= 5)
+				{
+					return Objectives[i].PlayerOneCaptured;
+				}
+				else
+				{
+					return Objectives[i].Uncaptured;
+				}
 			}
 			else
-			{
-				// We don't own it so set to other player
-				return Objectives[i].PlayerTwoCaptured;
+			{// We own it so set image as highlighted
+				if(Objectives[i].captureProgress >= 147)
+				{
+					return Objectives[i].PlayerTwoCaptured;
+				}
+				else
+				{
+					return Objectives[i].Uncaptured;
+				}
 			}
 		}
 

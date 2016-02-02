@@ -3,7 +3,7 @@ using System.Collections;
 
 public class SceneTransition : MonoBehaviour
 {
-	public void transition()
+	public void PlayGame()
 	{
 		if (Application.loadedLevelName == ("SplashScreen"))
 		{
@@ -15,7 +15,7 @@ public class SceneTransition : MonoBehaviour
 		}
 	}
 
-	public void end_game(bool p1)
+	public void EndGame(bool p1)
 	{
 		if (p1)
 		{
@@ -27,12 +27,12 @@ public class SceneTransition : MonoBehaviour
 		}
 	}
 
-	public void help()
+	public void HelpScreen()
 	{
 		Application.LoadLevel ("HelpScreen");
 	}
 
-	public void credits()
+	public void Credits()
 	{
 		Application.LoadLevel ("Credits");
 	}
