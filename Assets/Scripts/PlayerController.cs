@@ -5,9 +5,8 @@ using System.Collections.Generic;
 public class PlayerController : MonoBehaviour
 {
 	[Header("Properties")]
-	public float movementSpeed = 15f * 1.2f;
-	public int playerNumber;
-	public int numberOfPlayers = 2;
+	public float movementSpeed = 18.0f;
+	public int playerNumber = 1;
 
 	// Window Keys
 	private KeyCode upKey;
@@ -20,6 +19,7 @@ public class PlayerController : MonoBehaviour
 	private KeyCode DashKey;
 	private KeyCode BombKey;
 
+	// Xbox Controller
 	private KeyCode FreezeButton;
 	private KeyCode BlockButton;
 	private KeyCode DashButton;
@@ -28,88 +28,92 @@ public class PlayerController : MonoBehaviour
 	private Animator animator;
 
 	// Movement
-	public Vector2 velocity;
+	public Vector2 moveVelocity;
 	public bool isFrozen;
-	public bool ControlsLocked;
+	public bool controlsLocked;
 	private Rigidbody rigidBody;
 
-	public Vector3 DirectionVector;
-	public Vector3 LocalDirectionVector;
+	public Vector3 directionVector3D;
+	public Vector3 directionVector2D;
 
-	private AbilityController Abilities;
+	private AbilityController abilityController;
 
 	public AudioClip blockSound;
 	public AudioClip bombSound;
 	public AudioClip dashSound;
 	public AudioClip freezeSound;
-	private AudioSource audio;
+	private AudioSource audioSource;
 
 	void Start ()
 	{
 		// assign the character rigid body to this movement script
 		rigidBody = GetComponent<Rigidbody> ();
 	
+		// Set input keys
 		AssignInput();
 
-		Abilities = gameObject.GetComponent<AbilityController>();
+		// Access abilties
+		abilityController = gameObject.GetComponent<AbilityController>();
 
+		// Initialise to unfrozen
 		isFrozen = false;
 		animator.SetBool ("isFrozen", isFrozen);
-		
-		audio = GetComponent<AudioSource> ();
-		DirectionVector = new Vector3 (0, 0, -1);
-		LocalDirectionVector = new Vector3(0, -1, 0);
+
+		// Initialise direction vectors
+		directionVector3D = new Vector3 (0, 0, -1);		// World Space
+		directionVector2D = new Vector3(0, -1, 0);		// Local 2D
+
+		// Initialise audio
+		audioSource = GetComponent<AudioSource> ();
 	}
 
 	private void AssignInput()
 	{
 		switch (playerNumber)
 		{
-		case 1:
-			upKey = KeyCode.W;
-			downKey = KeyCode.S;
-			leftKey = KeyCode.A;
-			rightKey = KeyCode.D;
-			FreezeKey = KeyCode.Alpha1;
-			DashKey = KeyCode.Alpha2;
-			BlockKey = KeyCode.Alpha3;
-			BombKey = KeyCode.Alpha4;
-			FreezeButton = KeyCode.Joystick1Button0;
-			DashButton = KeyCode.Joystick1Button1;
-			BlockButton = KeyCode.Joystick1Button2;
-			BombButton = KeyCode.Joystick1Button3;
-			break;
+			case 1:
+				upKey = KeyCode.W;
+				downKey = KeyCode.S;
+				leftKey = KeyCode.A;
+				rightKey = KeyCode.D;
+				FreezeKey = KeyCode.Alpha1;
+				DashKey = KeyCode.Alpha2;
+				BlockKey = KeyCode.Alpha3;
+				BombKey = KeyCode.Alpha4;
+				FreezeButton = KeyCode.Joystick1Button0;
+				DashButton = KeyCode.Joystick1Button1;
+				BlockButton = KeyCode.Joystick1Button2;
+				BombButton = KeyCode.Joystick1Button3;
+				break;
 
-		case 2:
-			upKey = KeyCode.UpArrow;
-			downKey = KeyCode.DownArrow;
-			leftKey = KeyCode.LeftArrow;
-			rightKey = KeyCode.RightArrow;
-			FreezeKey = KeyCode.Alpha9;
-			DashKey = KeyCode.Alpha0;
-			BlockKey = KeyCode.Minus;
-			BombKey = KeyCode.Equals;
-			FreezeButton = KeyCode.Joystick2Button0;
-			DashButton = KeyCode.Joystick2Button1;
-			BlockButton = KeyCode.Joystick2Button2;
-			BombButton = KeyCode.Joystick2Button3;
-			break;
+			case 2:
+				upKey = KeyCode.UpArrow;
+				downKey = KeyCode.DownArrow;
+				leftKey = KeyCode.LeftArrow;
+				rightKey = KeyCode.RightArrow;
+				FreezeKey = KeyCode.Alpha9;
+				DashKey = KeyCode.Alpha0;
+				BlockKey = KeyCode.Minus;
+				BombKey = KeyCode.Equals;
+				FreezeButton = KeyCode.Joystick2Button0;
+				DashButton = KeyCode.Joystick2Button1;
+				BlockButton = KeyCode.Joystick2Button2;
+				BombButton = KeyCode.Joystick2Button3;
+				break;
 			
-		default:
-			Debug.LogError ("Unknown playerNumber, input not set");
-			break;
+			default:
+				Debug.LogError ("Unknown playerNumber, input not set");
+				break;
 		}
 		
-		this.animator = this.GetComponent<Animator> ();
+		animator = GetComponent<Animator> ();
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
-		animator.SetBool ("isFrozen", isFrozen);
-
 		// Controls disabled
-		if(ControlsLocked)
+		if(controlsLocked)
 			return;
 
 		// If we are frozen we cant move
@@ -121,123 +125,146 @@ public class PlayerController : MonoBehaviour
 		HandleAbility();
 
 		// move the character
-		rigidBody.velocity = new Vector3 (velocity.x, 0, velocity.y);
+		rigidBody.velocity = new Vector3 (moveVelocity.x, 0, moveVelocity.y);
 	}
 
 	private void HandleMovement ()
 	{
-		// reset velocity
-		velocity.x = 0;
-		velocity.y = 0;
+		// Reset velocity
+		moveVelocity.x = 0;
+		moveVelocity.y = 0;
 
+		// XBOX CONTROLLER
 		float h = Input.GetAxis ("HorizontalLeftAnalogP" + playerNumber);
 		float v = Input.GetAxis ("VerticalLeftAnalogP" + playerNumber);
 
-		velocity.x = h;
-		velocity.y = v * -1;
+		moveVelocity.x = h;
+		moveVelocity.y = v * -1;
 
-		if (velocity.x == 0 && velocity.y == 0)
+		// WINDOWS
+		if (moveVelocity.x == 0 && moveVelocity.y == 0)
 		{
 			if (Input.GetKey (upKey))
 			{
-				velocity.y = movementSpeed;
+				moveVelocity.y = 1;
 			}
 			if (Input.GetKey (downKey))
 			{
-				velocity.y = -1 * movementSpeed;
+				moveVelocity.y = -1;
 			}
 			if (Input.GetKey (leftKey))
 			{
-				velocity.x = -1 * movementSpeed;
+				moveVelocity.x = -1;
 			}
 			if (Input.GetKey (rightKey))
 			{
-				velocity.x = movementSpeed;
+				moveVelocity.x = 1;
 			}
 		}
-		
-		if (animator != null)
+
+		// If we have an animator
+		if (animator)
 		{
-			animator.SetFloat ("velocity", Mathf.Sqrt(velocity.x*velocity.x + velocity.y * velocity.y));
+			// Animate walk sequence
+			animator.SetFloat ("velocity", Mathf.Sqrt(moveVelocity.x*moveVelocity.x + moveVelocity.y * moveVelocity.y));
+		}
+		
+		// Calculate rotation based on velocity -- THIS CAN BE REPLACED WITH DIRECTION VECTOR NOW!
+		if(moveVelocity.x != 0 || moveVelocity.y != 0)
+		{
+			transform.rotation = Quaternion.Euler (new Vector3(90,0,Mathf.Rad2Deg * Mathf.Atan2 (moveVelocity.y, moveVelocity.x) + 90));
 		}
 
-		if(velocity.x != 0 || velocity.y != 0)
-			transform.rotation = Quaternion.Euler (new Vector3(90,0,Mathf.Rad2Deg * Mathf.Atan2 (velocity.y, velocity.x) + 90));
+		// Calculate final velocity
+		moveVelocity = moveVelocity.normalized * movementSpeed;
 
-		velocity = velocity.normalized * movementSpeed;
-
-		CalculateDirectionVector ();
+		// Calculate 2D and 3D direction vector
+		CalculateDirectionVectors ();
 	}
 
 	private void HandleAbility()
 	{
-		if(Input.GetKeyDown(FreezeKey) || Input.GetKeyDown(FreezeButton))
-		{
-			if (playerNumber == 1){
-				Abilities.Freeze.UseAbility(Abilities.PlayerTwo);
-				audio.PlayOneShot(freezeSound, 0.7f);
-			} else if (playerNumber == 2){
-				Abilities.Freeze.UseAbility(Abilities.PlayerOne);
-				audio.PlayOneShot(freezeSound, 0.7f);
-			}
+		// Windows
+		CastAbility(abilityController.Freeze, FreezeKey, freezeSound, 0.7f);
+		CastAbility(abilityController.Dash, DashKey, dashSound, 0.7f);
+		CastAbility(abilityController.Block, BlockKey, blockSound, 0.7f);
+		CastAbility(abilityController.Bomb, BombKey, bombSound, 0.7f);
 
-		}
-		if(Input.GetKeyDown(DashKey) || Input.GetKeyDown(DashButton))
-		{
-			Abilities.Dash.UseAbility();
-			audio.PlayOneShot(dashSound, 0.7f);
-		}
-		if(Input.GetKeyDown(BlockKey) || Input.GetKeyDown(BlockButton))
-		{
-			Abilities.Block.UseAbility();
-			audio.PlayOneShot(blockSound, 0.7f);
-		}
-		if(Input.GetKeyDown(BombKey) || Input.GetKeyDown(BombButton))
-		{
-			Abilities.Bomb.UseAbility();
-			audio.PlayOneShot(bombSound, 0.7f);
-		}
+		// Xbox
+		CastAbility(abilityController.Freeze, FreezeButton, freezeSound, 0.7f);
+		CastAbility(abilityController.Dash, DashButton, dashSound, 0.7f);
+		CastAbility(abilityController.Block, BlockButton, blockSound, 0.7f);
+		CastAbility(abilityController.Bomb, BombButton, bombSound, 0.7f);
 	}
 
-	private void CalculateDirectionVector()
+	private void CastAbility(Ability ability, KeyCode key, AudioClip clip, float volume)
+	{
+		// Make sure we can use the ability
+		if(!ability.canUse)
+			return;
+
+		// Make sure the correct key has been pressed
+		if(!Input.GetKeyDown(key))
+			return;
+
+		// Use ability
+		ability.UseAbility();
+
+		// Play audio
+		audioSource.PlayOneShot(clip, volume);
+	}
+
+	private void CalculateDirectionVectors()
 	{
 		// Dont recalculate if we arent moving
-		if (velocity.x + velocity.y == 0)
+		if (moveVelocity.x + moveVelocity.y == 0)
 			return;
 
 		// Create a target
-		Vector3 Target = transform.position + new Vector3 (velocity.x, 0, velocity.y);
+		Vector3 Target = transform.position + new Vector3 (moveVelocity.x, 0, moveVelocity.y);
 
-		DirectionVector = Target - transform.position;
-		DirectionVector.Normalize ();
+		directionVector3D = Target - transform.position;
+		directionVector3D.Normalize ();
 
 		// Reformat to Local
-		LocalDirectionVector = new Vector3(DirectionVector.x, DirectionVector.z, 0.0f);
+		directionVector2D = new Vector3(directionVector3D.x, directionVector3D.z, 0.0f);
 	}
 
 	public void Knockback(Vector3 position, float force)
 	{
-		// Calculate a direction between player and object
-		Vector3 amount = (transform.position - position);
-		amount.Normalize();
+		//return;
 
-		// Apply force
-		amount *= force;
+		Vector3 difference, direction;
+		float t, magnitude, maxPos, finalForce;
 
-		// Set new position
-		// will trap player in the wall
-		// feature?
-		transform.position = transform.position + amount;
+		// Calculate difference between bomb explosion position and our position
+		difference = transform.position - position;
+
+		// Calculate direction and magnitude of the vector
+		direction = difference.normalized;
+		magnitude = difference.magnitude;
+
+		// Get the magitude of the explosion
+		maxPos = (direction*force).magnitude;
+
+		// Calculate how much to explode
+		t = (magnitude - 0) / (maxPos - 0);
+		t = Mathf.Clamp01(t);
+
+		finalForce = Mathf.Lerp(force, 0, t);
+
+		transform.position = Vector3.Lerp (transform.position, transform.position + (direction*finalForce), t);
 	}
 
 	public void Freeze(bool Flag)
 	{
 		isFrozen = Flag;
 		rigidBody.velocity = new Vector3 (0, 0, 0);
+		animator.SetBool ("isFrozen", isFrozen);
 	}
 
 	public void LockControls(bool Flag)
 	{
-		ControlsLocked = Flag;
+		controlsLocked = Flag;
 	}
 }

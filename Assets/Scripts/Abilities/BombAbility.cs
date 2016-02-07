@@ -1,68 +1,32 @@
 using UnityEngine;
 using System.Collections;
 
-public class BombAbility : MonoBehaviour
+public class BombAbility : Ability
 {
-	[Header("Properties")]
+	[Header("Spell Specific")]
 	public GameObject BombPrefab;
 	public float BombSpeed = 15.0f;
-	public float CooldownDuration = 10.0f;
 	public float bombDist;
-	
-	[Header("Usability")]
-	public bool HasAbility = true;
-	public bool CanUseAbility = true;
-
-	[Header("Access")]
-	public PlayerController playerController;
 	
 	void Start()
 	{
-		playerController = gameObject.GetComponent<PlayerController>();
+		playerController = GetComponent<PlayerController>();
 	}
-	
-	public void GrantAbility()
-	{
-		HasAbility = true;
-		CanUseAbility = true;
-	}
-	
-	public void TakeAbility()
-	{
-		HasAbility = false;
-		CanUseAbility = false;
-	}
-	
-	public void UseAbility ()
-	{
-		if(!HasAbility)
-		{
-			Debug.Log ("Cannot use ability");
-			return;
-		}
 		
-		if(!CanUseAbility)
-		{
-			Debug.Log ("Cannot use ability");
-			return;
-		}
-		
+	public override void CastAbility ()
+	{
+		Debug.Log ("Cast Bomb");
 		// Flag we are now dashing and cannot do so again yet
-		CanUseAbility = false;
+		canUse = false;
 
 		// Throw the bomb
-		GameObject CreatedBomb = (GameObject)Instantiate(BombPrefab, transform.position + (playerController.DirectionVector * 3), Quaternion.Euler(new Vector3(90,0,0))) as GameObject;
-		CreatedBomb.GetComponent<Bomb>().Initialise(playerController.DirectionVector, BombSpeed);
+		GameObject createdBomb = (GameObject)Instantiate(BombPrefab, transform.position + playerController.directionVector3D, Quaternion.Euler(new Vector3(90,0,0))) as GameObject;
+		createdBomb.GetComponent<Bomb>().Initialise(playerController.directionVector3D, BombSpeed);
 
-		Debug.Log ("Fire in the hole!");
+		// Tell physics engine to ignore collision between the bomb and the player that cast
+		Physics.IgnoreCollision(createdBomb.GetComponent<Collider>(), GetComponent<Collider>());
 
 		// Start Cooldown
 		StartCoroutine(Cooldown());
-	}
-	
-	private IEnumerator Cooldown()
-	{
-		yield return new WaitForSeconds(CooldownDuration);
-		CanUseAbility = true;
 	}
 }

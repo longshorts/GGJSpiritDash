@@ -6,11 +6,10 @@ public class Shrine : MonoBehaviour
 	public enum CaptureState { UNCAPTURED, PLAYERONE, PLAYERTWO };
 
 	[Header("Textures")]
-	public Sprite Uncaptured;
-	public Sprite PlayerOneCaptured;
-	public Sprite PlayerTwoCaptured;
-
-	public Texture2D UncapturedTex;
+	public Sprite uncapturedSprite;
+	public Sprite playerOneCapturedSprite;
+	public Sprite playerTwoCapturedSprite;
+	public Texture2D uncapturedTexture;
 
 	[Header("Colours")]
 	public Color PlayerOneColor = new Color(0,0,1,1);
@@ -35,9 +34,9 @@ public class Shrine : MonoBehaviour
 	private int ID = 0;
 
 	public AudioClip shrineSound;
-	private AudioSource audio;
+	private AudioSource audioSource;
 
-	private Color captureColor;
+	private Color captureColor = new Color(1,1,1,1);
 
 	// Use this for initialization
 	void Start ()
@@ -55,22 +54,15 @@ public class Shrine : MonoBehaviour
 
 		// Access material and set initial colour
 		material = GetComponent<Renderer>().material;
-		captureColor = new Color(1,1,1,1);
 		material.SetColor("_IconColour", captureColor);
+		material.SetTexture("_IconTex", uncapturedTexture);
 
-		// Create Textures
-		UncapturedTex = ConvertToTexture(Uncaptured);
-
-		UpdateShader(UncapturedTex);
-		audio = GetComponent<AudioSource> ();
+		// Access audio source
+		audioSource = GetComponent<AudioSource> ();
 	}
 
 	void Update()
 	{
-		// If we havent progressed in the capture, don't do anything
-		//if(captureProgress.Equals(lastCaptureProgress))
-			//return;
-
 		// If we dont have a player attempting to capture, don't do anything
 		if(!currentCapturer)
 			return;
@@ -97,11 +89,8 @@ public class Shrine : MonoBehaviour
 		}
 		else if(ownerState == CaptureState.UNCAPTURED)
 		{
-			Debug.Log ("This does actually get called!");
 			captureColor = NeutralColor;
 		}
-
-		//Debug.Log (captureColor);
 
 		// Update material
 		material.SetColor("_IconColour", captureColor);
@@ -138,9 +127,9 @@ public class Shrine : MonoBehaviour
 			ownerState = CaptureState.PLAYERONE;
 			owner = PlayerOne;
 			
-			if(!audio.isPlaying)
+			if(!audioSource.isPlaying)
 			{
-				audio.PlayOneShot(shrineSound, 0.6f);
+				audioSource.PlayOneShot(shrineSound, 0.6f);
 			}
 			
 			return;
@@ -162,9 +151,9 @@ public class Shrine : MonoBehaviour
 		{
 			ownerState = CaptureState.PLAYERTWO;
 			owner = PlayerTwo;
-			if(!audio.isPlaying)
+			if(!audioSource.isPlaying)
 			{
-				audio.PlayOneShot(shrineSound, 0.6f);
+				audioSource.PlayOneShot(shrineSound, 0.6f);
 			}
 
 			return;
@@ -209,12 +198,6 @@ public class Shrine : MonoBehaviour
 		return (value >= min) && (value <= max);
 	}
 
-	private void UpdateShader(Texture2D texture)
-	{
-		// Update
-		material.SetTexture("_IconTex", texture);
-	}
-
 	private void Clamp(ref float value, float min, float max)
 	{
 		if(value < min)
@@ -228,21 +211,5 @@ public class Shrine : MonoBehaviour
 		float range = upper - lower;
 
 		return (value - lower) / range;
-	}
-
-	// THIS MAY BE DELETED AT SOME POINT - SEE HOW IT GOES
-	public Texture2D ConvertToTexture(Sprite sprite)
-	{
-		if(sprite.rect.width != sprite.texture.width){
-			Texture2D newText = new Texture2D((int)sprite.rect.width,(int)sprite.rect.height);
-			Color[] newColors = sprite.texture.GetPixels((int)sprite.textureRect.x, 
-			                                             (int)sprite.textureRect.y, 
-			                                             (int)sprite.textureRect.width, 
-			                                             (int)sprite.textureRect.height );
-			newText.SetPixels(newColors);
-			newText.Apply();
-			return newText;
-		} else
-			return sprite.texture;
 	}
 }

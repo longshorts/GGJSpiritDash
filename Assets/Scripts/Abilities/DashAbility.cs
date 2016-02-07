@@ -2,65 +2,54 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class DashAbility : MonoBehaviour
+public class DashAbility : Ability
 {
-	[Header("Properties")]
-	public float DashAmount = 15.0f;
-	public float DashSpeed = 2.5f;
-	public float CooldownDuration = 10.0f;
-	
-	[Header("Usability")]
-	public bool HasAbility = false;
-	public bool CanUseAbility = false;
-	public bool IsDashing = false;
-
-	public Vector3 DashTargetLocation;
-
-	private PlayerController playerController;
-	private RaycastHit hit;
-	private Ray ray;
+	[Header("Spell Specific")]
+	public float dashDistance = 15.0f;
+	public float dashSpeed = 2.5f;
+	public bool isDashing = false;
+	public Vector3 dashStart;
+	public Vector3 dashFinish;
+	private Rigidbody rigidBody;
 
 	void Start()
 	{
 		playerController = GetComponent<PlayerController>();
+		rigidBody = GetComponent<Rigidbody> ();
 	}
-
-	public void GrantAbility()
+		
+	public override void CastAbility ()
 	{
-		HasAbility = true;
-		CanUseAbility = true;
-	}
-	
-	public void TakeAbility()
-	{
-		HasAbility = false;
-		CanUseAbility = false;
-	}
-
-	void Update()
-	{
-		if(!IsDashing)
+		Debug.Log ("Cast Dash");
+		if(isDashing)
 		{
+			Debug.Log ("Already dashing");
 			return;
 		}
+		
+		// Freeze controls
+		playerController.LockControls(true);
+		
+		// Flag we are now dashing and cannot do so again yet
+		isDashing = true;
+		canUse = false;
 
-		return;
+		dashStart = transform.position;
+		dashFinish = dashStart + (dashDistance * playerController.directionVector3D);
+		rigidBody.velocity = dashDistance * playerController.directionVector3D;
 
-		transform.position = Vector3.Lerp(transform.position, DashTargetLocation, DashSpeed);
 
-		if(transform.position.Equals(DashTargetLocation))
-		{
-			IsDashing = false;
-			playerController.LockControls(false);
-			StartCoroutine(Cooldown());
-		}
+		// Start Cooldown
+		StartCoroutine (Cooldown ());
+
+		// Start Dash
+		StartCoroutine(Dash ());
 	}
 
-	bool CheckLocation ()
+	private bool CheckLocation ()
 	{
-		ray.origin = transform.position;
-		ray.direction = playerController.DirectionVector;
-		Debug.DrawRay(ray.origin, (DashAmount * ray.direction), Color.green, 30.0f,false);
+		Ray ray = new Ray (transform.position, playerController.directionVector3D);
+		Debug.DrawRay(ray.origin, (dashDistance * ray.direction), Color.green, 30.0f,false);
 		
 		if (Physics.Raycast (ray, out hit, 20.0f))
 		{
@@ -68,10 +57,10 @@ public class DashAbility : MonoBehaviour
 			{
 				if (hit.distance < 4.0f)
 				{
-					ray.origin = transform.position + (DashAmount * new Vector3 (playerController.velocity.x, 0, playerController.velocity.y));
-					Vector3 facing2 = new Vector3 (playerController.velocity.x, 0, playerController.velocity.y);
+					ray.origin = transform.position + (dashDistance * new Vector3 (playerController.moveVelocity.x, 0, playerController.moveVelocity.y));
+					Vector3 facing2 = new Vector3 (playerController.moveVelocity.x, 0, playerController.moveVelocity.y);
 					facing2 = facing2.normalized;
-					ray.direction = playerController.DirectionVector;
+					ray.direction = playerController.directionVector3D;
 
 					// change this float for being able to jump across small obstacles(go lower) - will get stuck in large obstacles
 					if (Physics.Raycast (ray, out hit, 11.0f))
@@ -103,81 +92,18 @@ public class DashAbility : MonoBehaviour
 		return true;
 
 	}
-	
-	public void UseAbility ()
-	{
-		if(!HasAbility)
-		{
-			Debug.Log ("Cannot use ability");
-			return;
-		}
-
-		if(!CanUseAbility)
-		{
-			Debug.Log ("Cannot use ability");
-			return;
-		}
-
-		if(IsDashing)
-		{
-			Debug.Log ("Already dashing");
-			return;
-		}
-
-		if (!CheckLocation ())
-		{
-			return;
-		}
-
-		// Freeze controls
-		playerController.LockControls(true);
-
-		// Flag we are now dashing and cannot do so again yet
-		IsDashing = true;
-		CanUseAbility = false;
-
-		DashTargetLocation = transform.position + (DashAmount * playerController.DirectionVector);
-		GetComponent<Rigidbody>().velocity = DashAmount * playerController.DirectionVector;
-
-		StartCoroutine(Dash ());
-	}
-
-	private IEnumerator Cooldown()
-	{
-		yield return new WaitForSeconds(CooldownDuration);
-		CanUseAbility = true;
-	}
-
-	private bool Move()
-	{
-		transform.position = Vector3.Lerp(transform.position, DashTargetLocation, DashSpeed * Time.deltaTime);
-		if(Vector3.Distance(transform.position, DashTargetLocation) < 0.5f)
-		{
-			GetComponent<Rigidbody>().velocity = new Vector3();
-			IsDashing = false;
-			playerController.LockControls(false);
-			StartCoroutine(Cooldown());
-			return false;
-		}
-
-		return true;
-	}
 
 	private IEnumerator Dash()
 	{
-		while(true)
-		{
-			if(Move ())
-			{
-				yield return null;
-			}
-			else
-			{
-				break;
-			}
-		}
+		//while(true)
+		//{
+			//yield return null;
+		//}
 
 		Debug.Log ("Finished");
 		yield return new WaitForEndOfFrame();
+
+		// Start cooldown
+		StartCoroutine(Cooldown ());
 	}
 }

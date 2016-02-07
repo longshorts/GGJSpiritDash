@@ -1,72 +1,47 @@
 using UnityEngine;
 using System.Collections;
 
-public class FreezeAbility : MonoBehaviour
+public class FreezeAbility : Ability
 {
-	[Header("Properties")]
-	public float FreezeDuration = 5.0f;
-	public float CooldownDuration = 10.0f;
-
-	[Header("Usability")]
-	public bool HasAbility = false;
-	public bool CanUseAbility = false;
+	[Header("Spell Specific")]
+	public float freezeDuration = 5.0f;
+	public float FreezeRadius = 5.0f;
 
 	void Start()
 	{
-	}
-
-	public void GrantAbility()
-	{
-		HasAbility = true;
-		CanUseAbility = true;
-	}
-
-	public void TakeAbility()
-	{
-		HasAbility = false;
-		CanUseAbility = false;
-	}
-
-	public void UseAbility (GameObject obj)
-	{
-		if(!HasAbility)
+		// Get access to the opposing player
+		if(gameObject.tag.Equals("Player1"))
 		{
-			Debug.Log ("Cannot use ability");
-			return;
+			playerController = GameObject.FindGameObjectWithTag("Player2").GetComponent<PlayerController>();
 		}
-
-		if(!CanUseAbility)
+		else if(gameObject.tag.Equals("Player2"))
 		{
-			Debug.Log ("On Cooldown!");
-			return;
+			playerController = GameObject.FindGameObjectWithTag("Player1").GetComponent<PlayerController>();
 		}
-	
+	}
+
+	public override void CastAbility ()
+	{
+		Debug.Log ("Cast Freeze");
+
+		canUse = false;
+
 		// Attack Player
-		StartCoroutine(FreezePlayer(obj));
+		StartCoroutine(FreezePlayer(playerController.gameObject));
 	}
 
 	private IEnumerator FreezePlayer(GameObject Target)
 	{
-		CanUseAbility = false;
-
 		// Freeze the Player
-		Debug.Log ("Freeze motherfucker!");
-		Target.GetComponent<PlayerController>().Freeze(true);
+		playerController.Freeze(true);
 
 		// Wait for unfreeze
-		yield return new WaitForSeconds(FreezeDuration);
+		yield return new WaitForSeconds(freezeDuration);
 
 		// Unfreeze player
-		Target.GetComponent<PlayerController>().Freeze (false);
-		Debug.Log ("Get your head into the game!");
+		playerController.Freeze (false);
 
 		// Start Cooldown
 		StartCoroutine(Cooldown());
-	}
-
-	private IEnumerator Cooldown()
-	{
-		yield return new WaitForSeconds(CooldownDuration);
-		CanUseAbility = true;
 	}
 }

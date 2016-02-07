@@ -1,86 +1,52 @@
 using UnityEngine;
 using System.Collections;
 
-public class BlockAbility : MonoBehaviour
+public class BlockAbility : Ability
 {
-	[Header("Properties")]
-	public GameObject BlockPrefab;
-	public float CooldownDuration = 10.0f;
-	public float BlockDuration = 5.0f;
-	public float blockDist = 6.0f;
-
-	[Header("Usability")]
-	public bool HasAbility = true;
-	public bool CanUseAbility = true;
-	
-	private PlayerController playerController;
-	private GameObject Block;
+	[Header("Spell Specific")]
+	public GameObject blockPrefab;
+	public float abilityDuration = 5.0f;
+	public float spawnDistance = 6.0f;
+	private GameObject blockObj;
 	private Transform blockLocation;
-	private Vector3 blockCalc;
-
 	
 	void Start()
 	{
-		playerController = GetComponent<PlayerController>();
+		playerController = GetComponent<PlayerController> ();
 	}
 	
-	public void GrantAbility()
+	public override void CastAbility ()
 	{
-		HasAbility = true;
-		CanUseAbility = true;
-	}
-	
-	public void TakeAbility()
-	{
-		HasAbility = false;
-		CanUseAbility = false;
-	}
-	
-	public void UseAbility ()
-	{
-		if(!HasAbility)
-		{
-			Debug.Log ("Cannot use ability");
-			return;
-		}
-		
-		if(!CanUseAbility)
-		{
-			Debug.Log ("Cannot use ability");
-			return;
-		}
-
+		Debug.Log ("Cast Block");
 		// Flag we are now dashing and cannot do so again yet
-		CanUseAbility = false;
+		canUse = false;
+		
+		// Place blockObj
+		StartCoroutine (PlaceBlock ());
 
 		// Start Cooldown
 		StartCoroutine (Cooldown ());
-
-		// Place Block
-		StartCoroutine (BlockPlacement ());
-	}
-	
-	private IEnumerator Cooldown()
-	{
-		yield return new WaitForSeconds(CooldownDuration);
-		CanUseAbility = true;
 	}
 
-	private IEnumerator BlockPlacement()
+
+	private IEnumerator PlaceBlock()
 	{
+		Vector3 blockPosition;
+
 		// Place behind us
-		blockCalc = transform.position + (blockDist * playerController.LocalDirectionVector * -1);
-		Block = (GameObject)Instantiate (BlockPrefab, blockCalc, new Quaternion (0, 1, 0, 0)) as GameObject;
-		Block.name = "Placed Block"; 
+		blockPosition = transform.position + (spawnDistance * playerController.directionVector2D * -1);
+		blockObj = (GameObject)Instantiate (blockPrefab, blockPosition, new Quaternion (0, 1, 0, 0)) as GameObject;
+		blockObj.name = "Placed blockObj"; 
 
 		// Wait for x seconds
-		yield return new WaitForSeconds (BlockDuration);
+		yield return new WaitForSeconds (abilityDuration);
 
-		// If we have a block still, destroy it
-		if(Block)
+		// Check if we have a placed block
+		if(blockObj)
 		{
-			Destroy (Block);
-            Block = null;
+			// Destroy
+			Destroy (blockObj);
+            blockObj = null;
         }
 	}
 }

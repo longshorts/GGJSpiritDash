@@ -47,7 +47,7 @@ public class Player : MonoBehaviour
 		// Uncaptured
 		if(Objectives[i].owner == null)
 		{
-			return Objectives[i].Uncaptured;
+			return Objectives[i].uncapturedSprite;
 		}
 
 		// If we own it then update to our colour version
@@ -59,27 +59,27 @@ public class Player : MonoBehaviour
 				// We own it so set image as highlighted
 				if(Objectives[i].captureProgress <= 5)
 				{
-					return Objectives[i].PlayerOneCaptured;
+					return Objectives[i].playerOneCapturedSprite;
 				}
 				else
 				{
-					return Objectives[i].Uncaptured;
+					return Objectives[i].uncapturedSprite;
 				}
 			}
 			else
 			{// We own it so set image as highlighted
 				if(Objectives[i].captureProgress >= 147)
 				{
-					return Objectives[i].PlayerTwoCaptured;
+					return Objectives[i].playerTwoCapturedSprite;
 				}
 				else
 				{
-					return Objectives[i].Uncaptured;
+					return Objectives[i].uncapturedSprite;
 				}
 			}
 		}
 
 		// We shouldnt make it here
-		return Objectives[i].Uncaptured;
+		return Objectives[i].uncapturedSprite;
 	}
 }
