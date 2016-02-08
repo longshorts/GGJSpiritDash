@@ -23,7 +23,6 @@ public class Shrine : MonoBehaviour
 	[Header("Capturing")]
 	public float conversionSpeed = 0.0f;
 	public float captureProgress = 76.0f;
-	private float lastCaptureProgress = 76.0f;
 	private GameObject currentCapturer = null;
 
 	[Header("Objects")]
@@ -31,7 +30,6 @@ public class Shrine : MonoBehaviour
 	public GameObject PlayerTwo;
 
 	private Material material;
-	private int ID = 0;
 
 	public AudioClip shrineSound;
 	private AudioSource audioSource;
@@ -66,9 +64,6 @@ public class Shrine : MonoBehaviour
 		// If we dont have a player attempting to capture, don't do anything
 		if(!currentCapturer)
 			return;
-
-		// Update the last progress
-		lastCaptureProgress = captureProgress;
 
 		float Percentage = 0.0f;
 

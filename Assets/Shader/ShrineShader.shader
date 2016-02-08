@@ -21,9 +21,13 @@
             SetTexture [_IconTex]
             {
             	constantColor[_IconColour]
-                combine constant lerp(texture) previous
+                combine constant lerp(texture) texture
             }
             
+            SetTexture [_MainTex]
+            {
+            	combine previous lerp(previous) texture
+            }
         }
     }
 }

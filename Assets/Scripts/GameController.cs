@@ -14,6 +14,7 @@ public class GameController : MonoBehaviour
 	public Player PlayerOne;
 	public Player PlayerTwo;
 	public List<Shrine> LevelShrines;	// array of references to shrine scripts
+	public Portal portal;
 
 	private SceneTransition sceneTransition;
 	
@@ -68,17 +69,9 @@ public class GameController : MonoBehaviour
 		CheckPlayerWin(ref PlayerOne, Shrine.CaptureState.PLAYERONE);
 		CheckPlayerWin(ref PlayerTwo, Shrine.CaptureState.PLAYERTWO);
 
-		if(PlayerOne.Complete)
+		if(PlayerOne.Complete || PlayerTwo.Complete)
 		{
-			Debug.Log ("Player One collected all shrines");
-		}
-		else if(PlayerTwo.Complete)
-		{
-			Debug.Log ("Player Two collected all shrines");
-		}
-		else if(PlayerOne.Complete && PlayerTwo.Complete)
-		{
-			Debug.Log ("Draw");
+			portal.Activate();
 		}
 	}
 
