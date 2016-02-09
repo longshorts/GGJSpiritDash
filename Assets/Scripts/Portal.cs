@@ -54,17 +54,9 @@ public class Portal : MonoBehaviour
 
 	void Update()
 	{
-		// REMOVE AFTER TESTING
-		if(Input.GetKeyDown(KeyCode.P))
-		{
-			Activate ();
-		}
-
 		// Don't bother continuing if we arent active
 		if(!isActivated)
 			return;
-
-		Debug.Log ("ROTATE");
 
 		// Portal background
 		portalParts[1].transform.RotateAround(rotatePoint.position, new Vector3(0, 1, 0), Time.deltaTime * spiralSpeed);
@@ -95,9 +87,6 @@ public class Portal : MonoBehaviour
 		spiralSpeed *= 10.0f;
 		spiralCoreSpeed *= 10.0f;
 		runeSpeed *= 10;
-
-		// Start the flickering the portals
-		StartCoroutine(FlickerParts());
 				
 		// Open the portal
 		StartCoroutine(OpenPortal());
@@ -154,29 +143,5 @@ public class Portal : MonoBehaviour
 		runeSpeed /= 10;
 
 		boxCollider.enabled = true;
-	}
-
-	// MIGHT STILL BE ABLE TO USE
-	private IEnumerator FlickerParts()
-	{
-		while(!isOpened)
-		{
-			// Wait for seconds
-			yield return new WaitForSeconds(Random.Range(5,10) * Time.deltaTime);
-			foreach(GameObject obj in portalParts)
-			{
-				obj.SetActive(!obj.activeSelf);
-			}
-
-			yield return null;
-		}
-
-		// Make sure they are active
-		foreach(GameObject obj in portalParts)
-		{
-			obj.SetActive(true);
-		}
-		
-		yield return new WaitForEndOfFrame();
 	}
 }

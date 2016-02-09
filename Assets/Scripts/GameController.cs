@@ -5,71 +5,88 @@ using System.Linq;
 
 public class GameController : MonoBehaviour
 {
+	public enum GameWinState { PLAYERONE, PLAYERTWO, DRAW };
+
 	[Header("Game Properties")]
 	public int shrinesRequired = 5;		// shrines required to win
 	public int maxShrines = 12;			// how many shrines in the level
-	public bool GameRunning;			// whether the level is GameRunning
+	public bool isRunning;			// whether the level is isRunning
 
 	[Header("Objects")]
-	public Player PlayerOne;
-	public Player PlayerTwo;
-	public List<Shrine> LevelShrines;	// array of references to shrine scripts
+	public Player playerOne;
+	public Player playerTwo;
+	public List<Shrine> gameShrines;	// array of references to shrine scripts
 	public Portal portal;
+	public GameWinState gameWinner;	// Who won
 
 	private SceneTransition sceneTransition;
 	
 	void Start ()
 	{
 		// initialize game state variables
-		GameRunning = false;
+		isRunning = false;
 		sceneTransition = GetComponent<SceneTransition> ();
 
 		// Initialise Players
-		PlayerOne = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
-		PlayerTwo = GameObject.FindGameObjectWithTag("Player2").GetComponent<Player>();
+		playerOne = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
+		playerTwo = GameObject.FindGameObjectWithTag("Player2").GetComponent<Player>();
 
 		// Retrieve gameobjects for our shrines
 		GameObject[] shrine = GameObject.FindGameObjectsWithTag("Shrine");
 
 		// Compile list of shrine capture scripts
-		LevelShrines = new List<Shrine>();
+		gameShrines = new List<Shrine>();
 		foreach(GameObject obj in shrine)
 		{
-			LevelShrines.Add (obj.GetComponent<Shrine>());
+			gameShrines.Add (obj.GetComponent<Shrine>());
 		}
+
+		// Allocate shrines
+		AllocateShrines();
+
+		// Flag we are playing
+		isRunning = true;
+
+		// Flag we don't wanna destroy this
+		DontDestroyOnLoad(this);
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
 		// if this is the first cycle of this match
-		if (!GameRunning)
+		if (!isRunning)
 		{
-			AllocateShrines();
-			GameRunning = true;
+			return;
 		}
 
-		// check whether the player controls all of their shrines
-		CheckProgress ();
-
-		if (PlayerOne.Victory)
+		// Check if either player has won
+		if(playerOne.Victory)
 		{
-			sceneTransition.EndGame (true);
+			gameWinner = GameWinState.PLAYERONE;
+			isRunning = false;
+			sceneTransition.EndGame ();
 		}
-		else if (PlayerTwo.Victory)
+		else if(playerTwo.Victory)
 		{
-			Debug.Log ("gotoendscreen");
-			sceneTransition.EndGame (false);
+			gameWinner = GameWinState.PLAYERTWO;
+			isRunning = false;
+			sceneTransition.EndGame();
+		}
+		else
+		{
+			// check whether the player controls all of their shrines
+			CheckProgress ();
 		}
 	}
 
 	void CheckProgress()
 	{
 		// Check how many shrines have been collected by each player
-		CheckPlayerWin(ref PlayerOne, Shrine.CaptureState.PLAYERONE);
-		CheckPlayerWin(ref PlayerTwo, Shrine.CaptureState.PLAYERTWO);
+		CheckPlayerWin(ref playerOne, Shrine.CaptureState.PLAYERONE);
+		CheckPlayerWin(ref playerTwo, Shrine.CaptureState.PLAYERTWO);
 
-		if(PlayerOne.Complete || PlayerTwo.Complete)
+		if(playerOne.Complete || playerTwo.Complete)
 		{
 			portal.Activate();
 		}
@@ -97,20 +114,20 @@ public class GameController : MonoBehaviour
 	private void AllocateShrines()
 	{
 		// Shuffle the list
-		LevelShrines.Shuffle();
+		gameShrines.Shuffle();
 
 		// Take the number of shrines we need
-		Shrine[] PlayerOneShrines = LevelShrines.Take(shrinesRequired).ToArray();
+		Shrine[] playerOneShrines = gameShrines.Take(shrinesRequired).ToArray();
 
 		// Shuffle the list
-		LevelShrines.Shuffle();
+		gameShrines.Shuffle();
 
 		// Take the number of shrines we need
-		Shrine[] PlayerTwoShrines = LevelShrines.Take(shrinesRequired).ToArray();
+		Shrine[] playerTwoShrines = gameShrines.Take(shrinesRequired).ToArray();
 
 		// Give the objectives to the player
-		AllocateShrinesToPlayer(ref PlayerOne, PlayerOneShrines);
-		AllocateShrinesToPlayer(ref PlayerTwo, PlayerTwoShrines);
+		AllocateShrinesToPlayer(ref playerOne, playerOneShrines);
+		AllocateShrinesToPlayer(ref playerTwo, playerTwoShrines);
 	}
 	
 	private void AllocateShrinesToPlayer(ref Player player, Shrine[] PlayerShrines)

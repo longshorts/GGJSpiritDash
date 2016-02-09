@@ -14,16 +14,18 @@ public class PlayerController : MonoBehaviour
 	private KeyCode leftKey;
 	private KeyCode rightKey;
 
-	private KeyCode FreezeKey;
-	private KeyCode BlockKey;
-	private KeyCode DashKey;
-	private KeyCode BombKey;
+	private KeyCode freezeKey;
+	private KeyCode blockKey;
+	private KeyCode dashKey;
+	private KeyCode bombKey;
+	private KeyCode attackKey;
 
 	// Xbox Controller
-	private KeyCode FreezeButton;
-	private KeyCode BlockButton;
-	private KeyCode DashButton;
-	private KeyCode BombButton;
+	private KeyCode freezeButton;
+	private KeyCode blockButton;
+	private KeyCode dashButton;
+	private KeyCode bombButton;
+	private KeyCode attackButton;
 
 	private Animator animator;
 
@@ -42,6 +44,7 @@ public class PlayerController : MonoBehaviour
 	public AudioClip bombSound;
 	public AudioClip dashSound;
 	public AudioClip freezeSound;
+	public AudioClip attackSound;
 	private AudioSource audioSource;
 
 	void Start ()
@@ -76,14 +79,15 @@ public class PlayerController : MonoBehaviour
 				downKey = KeyCode.S;
 				leftKey = KeyCode.A;
 				rightKey = KeyCode.D;
-				FreezeKey = KeyCode.Alpha1;
-				DashKey = KeyCode.Alpha2;
-				BlockKey = KeyCode.Alpha3;
-				BombKey = KeyCode.Alpha4;
-				FreezeButton = KeyCode.Joystick1Button0;
-				DashButton = KeyCode.Joystick1Button1;
-				BlockButton = KeyCode.Joystick1Button2;
-				BombButton = KeyCode.Joystick1Button3;
+				freezeKey = KeyCode.Alpha1;
+				dashKey = KeyCode.Alpha2;
+				blockKey = KeyCode.Alpha3;
+				bombKey = KeyCode.Alpha4;
+				attackKey = KeyCode.Alpha5;
+				freezeButton = KeyCode.Joystick1Button0;
+				dashButton = KeyCode.Joystick1Button1;
+				blockButton = KeyCode.Joystick1Button2;
+				bombButton = KeyCode.Joystick1Button3;
 				break;
 
 			case 2:
@@ -91,14 +95,15 @@ public class PlayerController : MonoBehaviour
 				downKey = KeyCode.DownArrow;
 				leftKey = KeyCode.LeftArrow;
 				rightKey = KeyCode.RightArrow;
-				FreezeKey = KeyCode.Alpha9;
-				DashKey = KeyCode.Alpha0;
-				BlockKey = KeyCode.Minus;
-				BombKey = KeyCode.Equals;
-				FreezeButton = KeyCode.Joystick2Button0;
-				DashButton = KeyCode.Joystick2Button1;
-				BlockButton = KeyCode.Joystick2Button2;
-				BombButton = KeyCode.Joystick2Button3;
+				freezeKey = KeyCode.Alpha9;
+				dashKey = KeyCode.Alpha0;
+				attackKey = KeyCode.Alpha8;
+				blockKey = KeyCode.Minus;
+				bombKey = KeyCode.Equals;
+				freezeButton = KeyCode.Joystick2Button0;
+				dashButton = KeyCode.Joystick2Button1;
+				blockButton = KeyCode.Joystick2Button2;
+				bombButton = KeyCode.Joystick2Button3;
 				break;
 			
 			default:
@@ -185,16 +190,18 @@ public class PlayerController : MonoBehaviour
 	private void HandleAbility()
 	{
 		// Windows
-		CastAbility(abilityController.Freeze, FreezeKey, freezeSound, 0.7f);
-		CastAbility(abilityController.Dash, DashKey, dashSound, 0.7f);
-		CastAbility(abilityController.Block, BlockKey, blockSound, 0.7f);
-		CastAbility(abilityController.Bomb, BombKey, bombSound, 0.7f);
+		CastAbility(abilityController.Freeze, freezeKey, freezeSound, 0.7f);
+		CastAbility(abilityController.Dash, dashKey, dashSound, 0.7f);
+		CastAbility(abilityController.Block, blockKey, blockSound, 0.7f);
+		CastAbility(abilityController.Bomb, bombKey, bombSound, 0.7f);
+		CastAbility(abilityController.Attack, attackKey, attackSound, 0.7f);
 
 		// Xbox
-		CastAbility(abilityController.Freeze, FreezeButton, freezeSound, 0.7f);
-		CastAbility(abilityController.Dash, DashButton, dashSound, 0.7f);
-		CastAbility(abilityController.Block, BlockButton, blockSound, 0.7f);
-		CastAbility(abilityController.Bomb, BombButton, bombSound, 0.7f);
+		CastAbility(abilityController.Freeze, freezeButton, freezeSound, 0.7f);
+		CastAbility(abilityController.Dash, dashButton, dashSound, 0.7f);
+		CastAbility(abilityController.Block, blockButton, blockSound, 0.7f);
+		CastAbility(abilityController.Bomb, bombButton, bombSound, 0.7f);
+		CastAbility(abilityController.Attack, attackButton, attackSound, 0.7f);
 	}
 
 	private void CastAbility(Ability ability, KeyCode key, AudioClip clip, float volume)

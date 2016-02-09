@@ -28,6 +28,9 @@ public class FreezeAbility : Ability
 
 		// Attack Player
 		StartCoroutine(FreezePlayer(playerController.gameObject));
+		
+		// Start Cooldown
+		StartCoroutine (Cooldown ());
 	}
 
 	private IEnumerator FreezePlayer(GameObject Target)
@@ -40,8 +43,5 @@ public class FreezeAbility : Ability
 
 		// Unfreeze player
 		playerController.Freeze (false);
-
-		// Start Cooldown
-		StartCoroutine(Cooldown());
 	}
 }

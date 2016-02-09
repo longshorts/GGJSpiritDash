@@ -12,6 +12,7 @@ public class AbilityController : MonoBehaviour
 	public DashAbility Dash;
 	public BlockAbility Block;
 	public BombAbility Bomb;
+	public AttackAbility Attack;
 
 	void Start()
 	{
@@ -23,6 +24,7 @@ public class AbilityController : MonoBehaviour
 		Dash = GetComponent<DashAbility>();
 		Block = GetComponent<BlockAbility>();
 		Bomb = GetComponent<BombAbility>();
+		Attack = GetComponent<AttackAbility>();
 
 		GiveAllAbilities ();
 	}
@@ -33,5 +35,6 @@ public class AbilityController : MonoBehaviour
 		Dash.GiveAbility ();
 		Block.GiveAbility ();
 		Bomb.GiveAbility ();
+		Attack.GiveAbility();
 	}
 }

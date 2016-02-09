@@ -7,7 +7,7 @@ public class SceneTransition : MonoBehaviour
 	{
 		if (Application.loadedLevelName == ("SplashScreen"))
 		{
-			Application.LoadLevel ("TheMainLevel");
+			Application.LoadLevel ("Level_1");
 		}
 		else
 		{
@@ -15,21 +15,19 @@ public class SceneTransition : MonoBehaviour
 		}
 	}
 
-	public void EndGame(bool p1)
+	public void EndGame()
 	{
-		if (p1)
-		{
-			Application.LoadLevel ("P1EndScreen");
-		}
-		else
-		{
-			Application.LoadLevel ("P2EndScreen");
-		}
+		Application.LoadLevel("GameComplete");
 	}
 
 	public void HelpScreen()
 	{
 		Application.LoadLevel ("HelpScreen");
+	}
+
+	public void QuitGame()
+	{
+		Application.Quit();
 	}
 
 	public void Credits()
