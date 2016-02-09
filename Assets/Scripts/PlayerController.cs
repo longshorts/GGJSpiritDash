@@ -47,6 +47,11 @@ public class PlayerController : MonoBehaviour
 	public AudioClip attackSound;
 	private AudioSource audioSource;
 
+	//Kill/Respawn
+	private float maxRespawnTime = 1f;
+	private float respawnTimer = 0.0f;
+	private bool isAlive = true;
+
 	void Start ()
 	{
 		// assign the character rigid body to this movement script
@@ -125,6 +130,12 @@ public class PlayerController : MonoBehaviour
 
 		// If we are frozen we cant move
 		if(isFrozen)
+			return;
+
+		if (checkRespawn())
+			Respawn ();
+
+		if (!isAlive)
 			return;
 
 		// Handle movement
@@ -263,6 +274,45 @@ public class PlayerController : MonoBehaviour
 		finalForce = Mathf.Lerp(force, 0, t);
 
 		transform.position = Vector3.Lerp (transform.position, transform.position + (direction*finalForce), t);
+	}
+
+	//Kills this player. Returns false if player already dead.
+	public bool Kill(){
+		if (isAlive) {
+			isAlive = false;
+			respawnTimer = 0.0f;
+			GetComponent<Renderer>().enabled = isAlive;
+			GetComponent<Animator>().enabled = isAlive;
+			GetComponent<Collider>().enabled = isAlive;
+			return true;
+		} else
+			return false;
+
+	}
+
+	private bool checkRespawn(){
+		if (!isAlive && respawnTimer >= maxRespawnTime)
+			return true;
+		else {
+			respawnTimer += Time.deltaTime;
+			return false;
+		}
+	}
+
+	private void Respawn(){
+		GameObject spawn = GameObject.Find ("Player" + playerNumber + "Spawn");
+
+		if (spawn != null) {
+			transform.position = spawn.transform.position;
+		} else {
+			Debug.LogError ("Cannot Respawn! No spawn location prefab for player" + playerNumber);
+			return;
+		}
+
+		isAlive = true;
+		GetComponent<Renderer>().enabled = isAlive;
+		GetComponent<Animator>().enabled = isAlive;
+		GetComponent<Collider>().enabled = isAlive;
 	}
 
 	public void Freeze(bool Flag)
