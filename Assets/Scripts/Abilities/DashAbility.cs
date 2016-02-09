@@ -5,97 +5,131 @@ using System.Collections.Generic;
 public class DashAbility : Ability
 {
 	[Header("Spell Specific")]
-	public float dashDistance = 15.0f;
-	public float dashSpeed = 2.5f;
+	public LayerMask outsideLayer;				// Layer for the outside walls
+	public LayerMask obstacleLayer;				// Layer for the inside obstacles
+	public float dashDistance = 15.0f;			// How far to dash
+	public float dashBacktrackAmount = 2.0f;	// How far to step backwards
+	public float dashSpeed = 2.5f;				// How long to dash from A to B
 	public bool isDashing = false;
-	public Vector3 dashStart;
-	public Vector3 dashFinish;
+	public Vector3 dashStart;					// Initial position
+	public Vector3 dashFinish;					// Final position
+	private float dashFrame;					// Animating frame for interpolation
 	private Rigidbody rigidBody;
 
 	void Start()
 	{
 		playerController = GetComponent<PlayerController>();
-		rigidBody = GetComponent<Rigidbody> ();
+		rigidBody = GetComponent<Rigidbody>();
+	}
+
+	void Update()
+	{
+		if(isDashing)
+			return;
+
+		dashStart = transform.position;
+		dashFinish = dashStart + (dashDistance * playerController.directionVector3D);
+		
+		Vector3 direction = dashStart - dashFinish;
+		direction.Normalize();
+
+		Debug.DrawLine(dashStart, dashFinish);
 	}
 		
 	public override void CastAbility ()
 	{
-		return;
-
-		Debug.Log ("Cast Dash");
 		if(isDashing)
 		{
 			Debug.Log ("Already dashing");
 			return;
 		}
+
+		dashFrame = 0.0f;
+
+		Debug.Log ("Cast Dash");
 		
 		// Freeze controls
 		playerController.LockControls(true);
+		rigidBody.isKinematic = true;
 		
 		// Flag we are now dashing and cannot do so again yet
 		isDashing = true;
 
+		// Calculate start and end points
 		dashStart = transform.position;
 		dashFinish = dashStart + (dashDistance * playerController.directionVector3D);
-		rigidBody.velocity = dashDistance * playerController.directionVector3D;
+
+		// Find a suitable location
+		CheckDashLocation();
+
+		StartCoroutine(Dash ());
 		
 		// Start Cooldown
 		StartCooldown();
 	}
 
-	private bool CheckLocation ()
+	private void CheckDashLocation()
 	{
-		Ray ray = new Ray (transform.position, playerController.directionVector3D);
-		Debug.DrawRay(ray.origin, (dashDistance * ray.direction), Color.green, 30.0f,false);
-		
-		if (Physics.Raycast (ray, out hit, 20.0f))
-		{
-			if (!hit.collider.isTrigger)
-			{
-				if (hit.distance < 4.0f)
-				{
-					ray.origin = transform.position + (dashDistance * new Vector3 (playerController.moveVelocity.x, 0, playerController.moveVelocity.y));
-					Vector3 facing2 = new Vector3 (playerController.moveVelocity.x, 0, playerController.moveVelocity.y);
-					facing2 = facing2.normalized;
-					ray.direction = playerController.directionVector3D;
+		Vector3 directionTo = dashFinish - dashStart;
+		Vector3 directionFrom = dashStart - dashFinish;
+		directionTo.Normalize();
+		directionFrom.Normalize();
 
-					// change this float for being able to jump across small obstacles(go lower) - will get stuck in large obstacles
-					if (Physics.Raycast (ray, out hit, 11.0f))
+		float distance = Vector3.Distance(dashStart, dashFinish);
+
+		// Raycast to target position
+		// If the raycast hits an outside wall
+		if(Physics.Raycast(dashStart, directionFrom, distance, 1 << outsideLayer))
+		{
+			Debug.Log ("Found an outside wall");
+
+			// Backtrack position
+			dashFinish = dashFinish + (directionFrom*dashBacktrackAmount);
+
+			return;
+		}
+		else
+		{
+			Debug.Log ("Found a inside wall");
+
+			// Otherwise check if the position will be inside a wall
+			if(Physics.CheckSphere(dashFinish, 0.01f))
+			{
+				// If it is, increase length until its not
+				while(true)
+				{
+					dashFinish += directionTo * Time.deltaTime;
+					if(!Physics.CheckSphere(dashFinish, 0.01f))
 					{
-						if (!hit.collider.isTrigger)
-						{
-							Debug.Log ("Wall in the way");
-							return false;
-						}
-						else
-						{
-							return true;
-						}
+						break;
 					}
 				}
-				else if (hit.distance < 16.0f)
-				{
-					Debug.Log ("Wall in the way");
-					return false;
-				}
-
-			}
-			else
-			{
-				return true;
 			}
 		}
-
-		return true;
-
 	}
 
 	private IEnumerator Dash()
 	{
-		//while(true)
-		//{
-			//yield return null;
-		//}
+		while(true)
+		{
+			// Interpolate between A and B
+			dashFrame += Time.deltaTime;
+			transform.position = Vector3.Lerp(dashStart, dashFinish, dashFrame / dashSpeed);
+
+			// If we have finished
+			if(transform.position.Equals(dashFinish))
+			{
+				break;
+			}
+			else
+			{
+				yield return null;
+			}
+		}
+
+		isDashing = false;
+		playerController.LockControls(false);
+		rigidBody.isKinematic = false;
 
 		Debug.Log ("Finished");
 		yield return new WaitForEndOfFrame();

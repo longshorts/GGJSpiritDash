@@ -29,7 +29,7 @@ public class AttackAbility : Ability
 		Vector3 RightRay = Quaternion.AngleAxis(FOV/2, Vector3.up) * transform.GetComponent<PlayerController>().directionVector3D;
 		Debug.DrawRay(transform.position, LeftRay * attackRange);
 		Debug.DrawRay(transform.position, RightRay * attackRange);
-		Debug.DrawRay(transform.position, transform.forward * attackRange);
+		Debug.DrawRay(transform.position, transform.GetComponent<PlayerController>().directionVector3D * attackRange);
 	}
 
 	public override void CastAbility ()
