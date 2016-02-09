@@ -3,24 +3,22 @@ using System.Collections;
 
 public class SceneTransition : MonoBehaviour
 {
-	public void PlayGame()
+	public void GoToGame()
 	{
-		if (Application.loadedLevelName == ("SplashScreen"))
-		{
-			Application.LoadLevel ("Level_1");
-		}
-		else
-		{
-			Application.LoadLevel ("SplashScreen");
-		}
+		Application.LoadLevel ("Level_1");
 	}
 
-	public void EndGame()
+	public void GoToTitleScreen()
+	{
+		Application.LoadLevel ("TitleScreen");
+	}
+
+	public void GoToGameComplete()
 	{
 		Application.LoadLevel("GameComplete");
 	}
 
-	public void HelpScreen()
+	public void GoToHelp()
 	{
 		Application.LoadLevel ("HelpScreen");
 	}
@@ -30,7 +28,7 @@ public class SceneTransition : MonoBehaviour
 		Application.Quit();
 	}
 
-	public void Credits()
+	public void GoToCredits()
 	{
 		Application.LoadLevel ("Credits");
 	}

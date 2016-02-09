@@ -9,19 +9,24 @@ public class GameCompleteUIManager : MonoBehaviour
 
 	void Start ()
 	{
-		gameController = GameObject.Find("GameController").GetComponent<GameController>();
-
-		if(!gameController)
+		GameObject controller = GameObject.Find ("GameController");
+		if(controller)
+		{
+			gameController = controller.GetComponent<GameController>();
+		}
+		else
+		{
 			return;
+		}
 
 		// Set the text
 		if(gameController.gameWinner == GameController.GameWinState.PLAYERONE)
 		{
-			uiText.text = "PLAYER ONE WINS";
+			uiText.text = "GAME OVER\n\nPLAYER ONE WINS";
 		}
 		else if(gameController.gameWinner == GameController.GameWinState.PLAYERTWO)
 		{
-			uiText.text = "PLAYER TWO WINS";
+			uiText.text = "GAME OVER\n\nPLAYER TWO WINS";
 		}
 		else
 		{

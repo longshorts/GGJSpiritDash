@@ -65,13 +65,13 @@ public class GameController : MonoBehaviour
 		{
 			gameWinner = GameWinState.PLAYERONE;
 			isRunning = false;
-			sceneTransition.EndGame ();
+			sceneTransition.GoToGameComplete ();
 		}
 		else if(playerTwo.Victory)
 		{
 			gameWinner = GameWinState.PLAYERTWO;
 			isRunning = false;
-			sceneTransition.EndGame();
+			sceneTransition.GoToGameComplete();
 		}
 		else
 		{
