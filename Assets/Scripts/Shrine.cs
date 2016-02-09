@@ -157,20 +157,23 @@ public class Shrine : MonoBehaviour
 
 	void OnTriggerStay(Collider other)
 	{
-		if (other.gameObject.tag == "Player1")
-		{
-			currentCapturer = PlayerOne;
-			captureProgress -= conversionSpeed * Time.deltaTime;
-			Clamp(ref captureProgress, 0, 152);
-			UpdateOwner();
-		}
-		else if (other.gameObject.tag == "Player2")
-		{	
-			currentCapturer = PlayerTwo;
-			captureProgress += conversionSpeed * Time.deltaTime;
-			Clamp(ref captureProgress, 0, 152);
-			UpdateOwner();
-		}
+        if (!other.isTrigger)
+        {
+            if (other.gameObject.tag == "Player1")
+            {
+                currentCapturer = PlayerOne;
+                captureProgress -= conversionSpeed * Time.deltaTime;
+                Clamp(ref captureProgress, 0, 152);
+                UpdateOwner();
+            }
+            else if (other.gameObject.tag == "Player2")
+            {
+                currentCapturer = PlayerTwo;
+                captureProgress += conversionSpeed * Time.deltaTime;
+                Clamp(ref captureProgress, 0, 152);
+                UpdateOwner();
+            }
+        }
 	}
 
 	void OnTriggerExit(Collider other)

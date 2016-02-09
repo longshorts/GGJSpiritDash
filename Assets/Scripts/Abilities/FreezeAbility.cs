@@ -5,8 +5,11 @@ public class FreezeAbility : Ability
 {
 	[Header("Spell Specific")]
 	public float freezeDuration = 5.0f;
-	public float FreezeRadius = 5.0f;
+	public float FreezeRadius = 20.0f;
 
+    private bool opponentInRange = false;
+
+    
 	void Start()
 	{
 		// Get access to the opposing player
@@ -18,17 +21,21 @@ public class FreezeAbility : Ability
 		{
 			playerController = GameObject.FindGameObjectWithTag("Player1").GetComponent<PlayerController>();
 		}
+        gameObject.GetComponent<SphereCollider>().radius = FreezeRadius;
 	}
 
 	public override void CastAbility ()
 	{
-		Debug.Log ("Cast Freeze");
+        if (opponentInRange)
+        {
+            Debug.Log("Cast Freeze");
 
-		// Start Cooldown
-		StartCooldown();
+            // Start Cooldown
+            StartCooldown();
 
-		// Attack Player
-		StartCoroutine(FreezePlayer(playerController.gameObject));
+            // Attack Player
+            StartCoroutine(FreezePlayer(playerController.gameObject));
+        }
 	}
 
 	private IEnumerator FreezePlayer(GameObject Target)
@@ -42,4 +49,22 @@ public class FreezeAbility : Ability
 		// Unfreeze player
 		playerController.Freeze (false);
 	}
+
+    private void OnTriggerEnter(Collider other)
+    {
+        // if the other player is in range, allow the ability to be performed
+        if (!other.isTrigger & other.gameObject.tag.Equals(playerController.gameObject.tag))
+        {
+            opponentInRange = true;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        // if the other player is not in range, do not allow the ability to be performed
+        if (!other.isTrigger & other.gameObject.tag.Equals(playerController.gameObject.tag))
+        {
+            opponentInRange = false;
+        }
+    }
 }
