@@ -122,7 +122,7 @@ public class Shrine : MonoBehaviour
 			ownerState = CaptureState.PLAYERONE;
 			owner = PlayerOne;
 			
-			if(!audioSource.isPlaying)
+			if(!audioSource.isPlaying && captureProgress > 0)
 			{
 				audioSource.PlayOneShot(shrineSound, 0.6f);
 			}
@@ -146,7 +146,7 @@ public class Shrine : MonoBehaviour
 		{
 			ownerState = CaptureState.PLAYERTWO;
 			owner = PlayerTwo;
-			if(!audioSource.isPlaying)
+			if(!audioSource.isPlaying && captureProgress < 152)
 			{
 				audioSource.PlayOneShot(shrineSound, 0.6f);
 			}

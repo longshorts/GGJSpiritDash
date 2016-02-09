@@ -35,9 +35,9 @@ public class AttackAbility : Ability
 	public override void CastAbility ()
 	{
 		SlashForward();
-
+		Debug.Log ("SLASH");
 		// Start Cooldown
-		StartCooldown();
+		//StartCooldown();
 	}
 
 	private void SlashForward()
@@ -62,8 +62,8 @@ public class AttackAbility : Ability
 				if(hit.collider.gameObject.tag == oppositionTarget.tag)
 				{
 					Debug.Log ("Found player");
-					// Attack player -- TODO
-					//oppositionTarget.GetComponent<Player>().ReceiveDamage(attackDamage);
+					// Attack player
+					oppositionTarget.GetComponent<PlayerController>().Kill ();
 				}
 			}
 		}
