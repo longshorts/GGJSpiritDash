@@ -88,6 +88,7 @@ public class PlayerController : MonoBehaviour
 				dashButton = KeyCode.Joystick1Button1;
 				blockButton = KeyCode.Joystick1Button2;
 				bombButton = KeyCode.Joystick1Button3;
+				attackButton = KeyCode.Joystick1Button5;
 				break;
 
 			case 2:
@@ -104,6 +105,7 @@ public class PlayerController : MonoBehaviour
 				dashButton = KeyCode.Joystick2Button1;
 				blockButton = KeyCode.Joystick2Button2;
 				bombButton = KeyCode.Joystick2Button3;
+				attackButton = KeyCode.Joystick2Button5;
 				break;
 			
 			default:

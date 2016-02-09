@@ -6,6 +6,7 @@ public class Ability : MonoBehaviour
 	[Header("Limitations")]
 	public bool hasAbility = false;
 	public bool canUse = false;
+	public float cooldownProgress;
 	public float abilityCooldown = 10.0f;
 
 	[Header("Component")]
@@ -51,11 +52,40 @@ public class Ability : MonoBehaviour
 		// OVERRIDE THIS
 	}
 
+	public void StartCooldown()
+	{
+		if(!canUse)
+			return;
+
+		// Disable
+		canUse = false;
+
+		// Start Cooldown
+		cooldownProgress = abilityCooldown;
+		StartCoroutine(Cooldown ());
+	}
+
 	// COOLDOWN
 	public IEnumerator Cooldown()
 	{
-		canUse = false;
-		yield return new WaitForSeconds(abilityCooldown);
+		while(true)
+		{
+			cooldownProgress -= Time.deltaTime;
+			if(cooldownProgress <= 0)
+			{
+				// Stop
+				break;
+			}
+			else
+			{
+				// Loop again
+				yield return null;
+			}
+		}
+
+		// Flag we can use
 		canUse = true;
+
+		yield return new WaitForEndOfFrame();
 	}
 }

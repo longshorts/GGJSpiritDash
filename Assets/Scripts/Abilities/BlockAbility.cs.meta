@@ -1,10 +1,12 @@
 fileFormatVersion: 2
 guid: 0d96e139a8a31cd47839dfbbd20681dc
-timeCreated: 1454174266
+timeCreated: 1455034058
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - playerController: {instanceID: 0}
+  - blockPrefab: {fileID: 154520, guid: 16ea0e39c73f7544fb7c7d5f9ac0bf6f, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

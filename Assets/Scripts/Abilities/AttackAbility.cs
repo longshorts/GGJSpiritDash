@@ -34,12 +34,10 @@ public class AttackAbility : Ability
 
 	public override void CastAbility ()
 	{
-		canUse = false;
-
 		SlashForward();
 
 		// Start Cooldown
-		StartCoroutine (Cooldown ());
+		StartCooldown();
 	}
 
 	private void SlashForward()

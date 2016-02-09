@@ -24,13 +24,11 @@ public class FreezeAbility : Ability
 	{
 		Debug.Log ("Cast Freeze");
 
-		canUse = false;
+		// Start Cooldown
+		StartCooldown();
 
 		// Attack Player
 		StartCoroutine(FreezePlayer(playerController.gameObject));
-		
-		// Start Cooldown
-		StartCoroutine (Cooldown ());
 	}
 
 	private IEnumerator FreezePlayer(GameObject Target)

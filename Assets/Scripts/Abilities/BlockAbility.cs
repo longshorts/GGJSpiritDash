@@ -18,14 +18,12 @@ public class BlockAbility : Ability
 	public override void CastAbility ()
 	{
 		Debug.Log ("Cast Block");
-		// Flag we are now dashing and cannot do so again yet
-		canUse = false;
 		
 		// Place blockObj
 		StartCoroutine (PlaceBlock ());
-
+		
 		// Start Cooldown
-		StartCoroutine (Cooldown ());
+		StartCooldown();
 	}
 
 

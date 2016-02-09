@@ -16,8 +16,6 @@ public class BombAbility : Ability
 	public override void CastAbility ()
 	{
 		Debug.Log ("Cast Bomb");
-		// Flag we are now dashing and cannot do so again yet
-		canUse = false;
 
 		// Throw the bomb
 		GameObject createdBomb = (GameObject)Instantiate(BombPrefab, transform.position + playerController.directionVector3D, Quaternion.Euler(new Vector3(90,0,0))) as GameObject;
@@ -25,8 +23,8 @@ public class BombAbility : Ability
 
 		// Tell physics engine to ignore collision between the bomb and the player that cast
 		Physics.IgnoreCollision(createdBomb.GetComponent<Collider>(), GetComponent<Collider>());
-
+		
 		// Start Cooldown
-		StartCoroutine(Cooldown());
+		StartCooldown();
 	}
 }

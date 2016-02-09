@@ -20,6 +20,8 @@ public class DashAbility : Ability
 		
 	public override void CastAbility ()
 	{
+		return;
+
 		Debug.Log ("Cast Dash");
 		if(isDashing)
 		{
@@ -32,18 +34,13 @@ public class DashAbility : Ability
 		
 		// Flag we are now dashing and cannot do so again yet
 		isDashing = true;
-		canUse = false;
 
 		dashStart = transform.position;
 		dashFinish = dashStart + (dashDistance * playerController.directionVector3D);
 		rigidBody.velocity = dashDistance * playerController.directionVector3D;
-
-
+		
 		// Start Cooldown
-		StartCoroutine (Cooldown ());
-
-		// Start Dash
-		StartCoroutine(Dash ());
+		StartCooldown();
 	}
 
 	private bool CheckLocation ()
@@ -102,8 +99,5 @@ public class DashAbility : Ability
 
 		Debug.Log ("Finished");
 		yield return new WaitForEndOfFrame();
-
-		// Start cooldown
-		StartCoroutine(Cooldown ());
 	}
 }

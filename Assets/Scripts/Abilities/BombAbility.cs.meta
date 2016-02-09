@@ -1,10 +1,12 @@
 fileFormatVersion: 2
 guid: 2764ca7ace74caa41b0c7de45ee3edb2
-timeCreated: 1454174559
+timeCreated: 1455034070
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - playerController: {instanceID: 0}
+  - BombPrefab: {fileID: 136986, guid: 08e57dc263c66754cb8e25b36b14f75a, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

@@ -26,6 +26,7 @@ public class AbilityController : MonoBehaviour
 		Bomb = GetComponent<BombAbility>();
 		Attack = GetComponent<AttackAbility>();
 
+		// Grant abilties
 		GiveAllAbilities ();
 	}
 
