@@ -1,27 +1,26 @@
 ﻿using UnityEngine;
 using System.Collections;
-using UnityEngine.SceneManagement;
 
 public class SceneTransition : MonoBehaviour
 {
 	public void GoToGame()
 	{
-		SceneManager.LoadScene ("Level_1");
+		Application.LoadLevel ("Level_1");
 	}
 
 	public void GoToTitleScreen()
 	{
-		SceneManager.LoadScene ("TitleScreen");
+		Application.LoadLevel ("TitleScreen");
 	}
 
 	public void GoToGameComplete()
 	{
-		SceneManager.LoadScene("GameComplete");
+		Application.LoadLevel("GameComplete");
 	}
 
 	public void GoToHelp()
 	{
-		SceneManager.LoadScene ("HelpScreen");
+		Application.LoadLevel ("HelpScreen");
 	}
 
 	public void QuitGame()
@@ -31,6 +30,6 @@ public class SceneTransition : MonoBehaviour
 
 	public void GoToCredits()
 	{
-		SceneManager.LoadScene ("Credits");
+		Application.LoadLevel ("Credits");
 	}
 }

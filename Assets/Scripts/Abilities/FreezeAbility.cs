@@ -38,11 +38,11 @@ public class FreezeAbility : Ability
 
 		// Create a sphere collider and attach to the player
 		sphereCollider = GetComponent<SphereCollider>();
+		Physics.IgnoreCollision(GetComponent<Collider>(), sphereCollider);
+
 		sphereCollider.isTrigger = true;
 		sphereCollider.enabled = false;
 		sphereCollider.radius = 0.0f;
-
-		Physics.IgnoreCollision(GetComponent<Collider>(), sphereCollider);
 	}
 
 	void OnTriggerEnter(Collider collider)

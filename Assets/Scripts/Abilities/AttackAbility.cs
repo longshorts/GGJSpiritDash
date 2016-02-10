@@ -8,6 +8,10 @@ public class AttackAbility : Ability
 	public float FOV = 45;
 	public float attackRange = 3;
 	public float attackDamage = 10;
+	public float slashDuration = 2;
+	public GameObject attackPrefab;
+	private float slashFrame = 0.0f;
+	private GameObject attackVisual;
 
 	void Start()
 	{
@@ -20,6 +24,11 @@ public class AttackAbility : Ability
 		{
 			oppositionTarget = GameObject.FindGameObjectWithTag("Player1");
 		}
+
+		// Set no object created yet
+		attackVisual = (GameObject)Instantiate(attackPrefab);
+		attackVisual.name = "Frost - " + tag;
+		attackVisual.SetActive(false);
 	}
 
 	void Update()
@@ -34,16 +43,28 @@ public class AttackAbility : Ability
 
 	public override void CastAbility ()
 	{
+		// Show the visual
+		attackVisual.SetActive(true);
+		attackVisual.transform.position = transform.position + (GetComponent<PlayerController>().directionVector3D * attackRange);
+		attackVisual.transform.rotation = transform.rotation;
+		Vector3 scale = attackVisual.transform.localScale;
+		scale.x *= -1;
+		attackVisual.transform.localScale = scale;
+
+		// Reset duration
+		slashFrame = 0.0f;
+
+		// Show the slash
+		StartCoroutine(ShowSlash());
+
+		// Attack forward
 		SlashForward();
-		Debug.Log ("SLASH");
-		// Start Cooldown
-		//StartCooldown();
+
+		StartCooldown();
 	}
 
 	private void SlashForward()
 	{
-
-
 		// Calculate a direction vector between us and the opposition
 		Vector3 direction = oppositionTarget.transform.position - transform.position;
 		
@@ -67,6 +88,31 @@ public class AttackAbility : Ability
 				}
 			}
 		}
+	}
+
+	private IEnumerator ShowSlash()
+	{
+		// No point progressing if we dont have a visual
+		if(!attackVisual)
+		{
+			yield return new WaitForEndOfFrame();
+		}
+
+		// Wait until cooldown has finished then destroy object
+		while(true)
+		{
+			slashFrame += Time.deltaTime;
+			if(slashFrame >= slashDuration)
+			{
+				break;
+			}
+
+			yield return null;
+		}
+
+		attackVisual.SetActive(false);
+
+		yield return new WaitForEndOfFrame();
 	}
 }
 
