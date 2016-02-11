@@ -95,15 +95,15 @@ public class Portal : MonoBehaviour
 	void OnTriggerEnter (Collider other)
 	{
 		// Get the player component
-		Player player = other.gameObject.GetComponent<Player>();
+		PlayerController player = other.gameObject.GetComponent<PlayerController>();
 		if(!player)
 			return;
 
 		// If the colliding player has captured their objectives
-		if(player.Complete)
+		if(player.isComplete)
 		{
 			// Flag we have won
-			player.Victory = true;
+			player.isWinner = true;
 			audioSource.PlayOneShot(soundGameOver, 0.7f);
 			Debug.Log ("Victory for " + other.tag);
 		}

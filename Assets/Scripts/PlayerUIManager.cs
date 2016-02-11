@@ -9,12 +9,12 @@ public class PlayerUIManager : MonoBehaviour
 	public Text[] spellUI;
 
 	[Header("Components")]
-	public Player player;
+	public PlayerController player;
 	public AbilityController abilityController;
 
 	void Start ()
 	{
-		player = GetComponent<Player>();
+		player = GetComponent<PlayerController>();
 		abilityController = GetComponent<AbilityController>();
 	}
 

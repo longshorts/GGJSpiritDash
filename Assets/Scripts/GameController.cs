@@ -8,16 +8,17 @@ public class GameController : MonoBehaviour
 	public enum GameWinState { PLAYERONE, PLAYERTWO, DRAW };
 
 	[Header("Game Properties")]
-	public int shrinesRequired = 5;		// shrines required to win
-	public int maxShrines = 12;			// how many shrines in the level
-	public bool isRunning;			// whether the level is isRunning
+	public int shrinesRequired = 4;		// Shrines required to win
+	public int maxShrines = 12;			// How many shrines in the level
+	public bool isRunning;				// Flag for checking if the game is running
 
 	[Header("Objects")]
-	public Player playerOne;
-	public Player playerTwo;
-	public List<Shrine> gameShrines;	// array of references to shrine scripts
-	public Portal portal;
-	public GameWinState gameWinner;	// Who won
+	public PlayerController playerOne;
+	public PlayerController playerTwo;
+	public List<Shrine> gameShrines;			// Array of references to shrine scripts
+	public List<GameObject> gameRespawns;		// List of spawn points
+	public Portal portal;						// Access to portal object
+	public GameWinState gameWinner;				// Who won
 
 	private SceneTransition sceneTransition;
 	
@@ -28,8 +29,8 @@ public class GameController : MonoBehaviour
 		sceneTransition = GetComponent<SceneTransition> ();
 
 		// Initialise Players
-		playerOne = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
-		playerTwo = GameObject.FindGameObjectWithTag("Player2").GetComponent<Player>();
+		playerOne = GameObject.FindGameObjectWithTag("Player1").GetComponent<PlayerController>();
+		playerTwo = GameObject.FindGameObjectWithTag("Player2").GetComponent<PlayerController>();
 
 		// Retrieve gameobjects for our shrines
 		GameObject[] shrine = GameObject.FindGameObjectsWithTag("Shrine");
@@ -40,6 +41,9 @@ public class GameController : MonoBehaviour
 		{
 			gameShrines.Add (obj.GetComponent<Shrine>());
 		}
+
+		// Get a list of respawn points
+		gameRespawns = GameObject.FindGameObjectsWithTag("Respawn").ToList();
 
 		// Allocate shrines
 		AllocateShrines();
@@ -61,13 +65,13 @@ public class GameController : MonoBehaviour
 		}
 
 		// Check if either player has won
-		if(playerOne.Victory)
+		if(playerOne.isWinner)
 		{
 			gameWinner = GameWinState.PLAYERONE;
 			isRunning = false;
 			sceneTransition.GoToGameComplete ();
 		}
-		else if(playerTwo.Victory)
+		else if(playerTwo.isWinner)
 		{
 			gameWinner = GameWinState.PLAYERTWO;
 			isRunning = false;
@@ -86,13 +90,22 @@ public class GameController : MonoBehaviour
 		CheckPlayerWin(ref playerOne, Shrine.CaptureState.PLAYERONE);
 		CheckPlayerWin(ref playerTwo, Shrine.CaptureState.PLAYERTWO);
 
-		if(playerOne.Complete || playerTwo.Complete)
+		if(playerOne.isComplete || playerTwo.isComplete)
 		{
 			portal.Activate();
 		}
 	}
 
-	private void CheckPlayerWin(ref Player player, Shrine.CaptureState state)
+	public void GetRespawnLocation(GameObject player)
+	{
+		// Sort respawns by closest
+		gameRespawns = gameRespawns.OrderBy(tile => Vector3.Distance(player.transform.position, tile.transform.position)).ToList();
+
+		// Update player position
+		player.transform.position = gameRespawns[0].transform.position;
+	}
+
+	private void CheckPlayerWin(ref PlayerController player, Shrine.CaptureState state)
 	{
 		int Count = 0;
 		
@@ -107,7 +120,7 @@ public class GameController : MonoBehaviour
 		
 		if(Count >= shrinesRequired)
 		{
-			player.Complete = true;
+			player.isComplete = true;
 		}
 	}
 
@@ -130,7 +143,7 @@ public class GameController : MonoBehaviour
 		AllocateShrinesToPlayer(ref playerTwo, playerTwoShrines);
 	}
 	
-	private void AllocateShrinesToPlayer(ref Player player, Shrine[] PlayerShrines)
+	private void AllocateShrinesToPlayer(ref PlayerController player, Shrine[] PlayerShrines)
 	{
 		// Initialise list
 		player.Objectives = new List<Shrine>();
