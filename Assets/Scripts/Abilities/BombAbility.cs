@@ -7,15 +7,21 @@ public class BombAbility : Ability
 	public GameObject BombPrefab;
 	public float BombSpeed = 15.0f;
 	public float bombDist;
+
+	private Animator animator;
 	
 	void Start()
 	{
 		playerController = GetComponent<PlayerController>();
+		animator = GetComponent<Animator> ();
 	}
 		
 	public override void CastAbility ()
 	{
 		Debug.Log ("Cast Bomb");
+
+		//Trigger player animation
+		animator.SetTrigger ("cast");
 
 		// Throw the bomb
 		GameObject createdBomb = (GameObject)Instantiate(BombPrefab, transform.position + playerController.directionVector3D, Quaternion.Euler(new Vector3(90,0,0))) as GameObject;
