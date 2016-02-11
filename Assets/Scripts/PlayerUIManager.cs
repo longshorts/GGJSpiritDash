@@ -50,7 +50,10 @@ public class PlayerUIManager : MonoBehaviour
 	private void UpdateObjectiveGUI()
 	{
 		if(objectivesUI.Length == 0)
+		{
+			Debug.Log ("Warning! No Objectives!");
 			return;
+		}
 		
 		// Loop through and get the sprite
 		for(int i = 0; i < objectivesUI.Length; i++)
@@ -62,7 +65,10 @@ public class PlayerUIManager : MonoBehaviour
 	private Sprite GetSprite(int i)
 	{
 		if(player.Objectives.Count == 0)
+		{
+			Debug.Log("No Objectives");
 			return null;
+		}
 		
 		// Uncaptured
 		if(player.Objectives[i].owner == null)

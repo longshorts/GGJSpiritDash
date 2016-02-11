@@ -77,7 +77,6 @@ public class PlayerController : MonoBehaviour
 		directionVector2D = new Vector3(0, -1, 0);		// Local 2D
 
 		// Initialise
-		Objectives = new List<Shrine>();
 		isComplete = false;
 		isWinner = false;
 	}

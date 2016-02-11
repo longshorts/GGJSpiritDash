@@ -27,13 +27,7 @@ public class DashAbility : Ability
 		if(isDashing)
 			return;
 
-		dashStart = transform.position;
-		dashFinish = dashStart + (dashDistance * playerController.directionVector3D);
-		
-		Vector3 direction = dashStart - dashFinish;
-		direction.Normalize();
-
-		Debug.DrawLine(dashStart, dashFinish);
+		Debug.DrawRay(transform.position, playerController.directionVector3D * dashDistance, Color.yellow);
 	}
 		
 	public override void CastAbility ()
@@ -57,55 +51,58 @@ public class DashAbility : Ability
 
 		// Calculate start and end points
 		dashStart = transform.position;
-		dashFinish = dashStart + (dashDistance * playerController.directionVector3D);
+		dashFinish = dashStart + (playerController.directionVector3D * dashDistance);
 
 		// Find a suitable location
 		CheckDashLocation();
-
+		
 		StartCoroutine(Dash ());
 		
 		// Start Cooldown
 		StartCooldown();
 	}
 
-	private void CheckDashLocation()
+	private bool CheckDashLocation()
 	{
-		Vector3 directionTo = dashFinish - dashStart;
-		Vector3 directionFrom = dashStart - dashFinish;
-		directionTo.Normalize();
-		directionFrom.Normalize();
+		RaycastHit hit;
 
-		float distance = Vector3.Distance(dashStart, dashFinish);
-
-		// Raycast to target position
-		// If the raycast hits an outside wall
-		if(Physics.Raycast(dashStart, directionFrom, distance, 1 << outsideLayer))
+		// Raycast forward, check for collision with the outside wall
+		if(Physics.Raycast(dashStart, playerController.directionVector3D, out hit, dashDistance, outsideLayer))
 		{
-			Debug.Log ("Found an outside wall");
+			Debug.Log ("Found an outside wall, backtracking!");
 
-			// Backtrack position
-			dashFinish = dashFinish + (directionFrom*dashBacktrackAmount);
+			// Set final point to collision point
+			dashFinish.x = hit.point.x;
+			dashFinish.z = hit.point.z;
 
-			return;
+			// Backtrack until we are safe
+			dashFinish -= playerController.directionVector3D * dashBacktrackAmount;
+
+			return true;
 		}
 		else
 		{
-			Debug.Log ("Found a inside wall");
-
-			// Otherwise check if the position will be inside a wall
+			// Check if there is something at the target destination
 			if(Physics.CheckSphere(dashFinish, 0.01f))
 			{
-				// If it is, increase length until its not
 				while(true)
 				{
-					dashFinish += directionTo * Time.deltaTime;
-					if(!Physics.CheckSphere(dashFinish, 0.01f))
+					// Otherwise check if the position will be inside a wall
+					if(Physics.CheckSphere(dashFinish, 0.01f))
 					{
+						dashFinish += playerController.directionVector3D;
+						Debug.Log ("Moving");
+					}
+					else
+					{
+						Debug.Log ("All clear");
 						break;
 					}
 				}
 			}
 		}
+
+		return true;
 	}
 
 	private IEnumerator Dash()
