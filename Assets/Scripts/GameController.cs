@@ -5,11 +5,9 @@ using System.Linq;
 
 public class GameController : MonoBehaviour
 {
-	public enum GameWinState { PLAYERONE, PLAYERTWO, NONE };
-
 	[Header("Game Properties")]
 	public int shrinesRequired = 4;							// Shrines required to win
-	public GameWinState gameWinner = GameWinState.NONE;		// Who won
+	public int roundCount = 3;								// Number of rounds
 	public bool portalActivated = false;					// Flag for whether portal is open or not
 
 	[Header("Objects")]
@@ -24,7 +22,7 @@ public class GameController : MonoBehaviour
 	
 	void Start ()
 	{
-		// initialize game state variables
+		// Initialize game state variables
 		sceneTransition = GetComponent<SceneTransition> ();
 
 		// Initialise Players
@@ -37,8 +35,30 @@ public class GameController : MonoBehaviour
 		// Get a list of shrines and split them between the two players
 		InitialiseShrines();
 
-		// Flag we don't wanna destroy this when we move to the game win scene
-		DontDestroyOnLoad(this);
+		// Check what round we are on
+		if(PlayerPrefs.HasKey("RoundNo"))
+		{
+			// Reset round count
+			if(PlayerPrefs.GetInt("RoundNo") >= roundCount)
+			{
+				PlayerPrefs.SetInt("RoundNo", 1);
+				PlayerPrefs.SetInt("PlayerOneWins", 0);
+				PlayerPrefs.SetInt("PlayerTwoWins", 0);
+			}
+			else
+			{
+				// Increase round count
+				PlayerPrefs.SetInt("RoundNo", PlayerPrefs.GetInt("RoundNo") + 1);
+			}
+		}
+		else
+		{
+			// Initialise for first time
+			PlayerPrefs.SetInt("RoundNo", 1);
+			PlayerPrefs.SetInt("PlayerOneWins", 0);
+			PlayerPrefs.SetInt("PlayerTwoWins", 0);
+		}
+		Debug.Log ("Round : " + PlayerPrefs.GetInt("RoundNo"));
 	}
 
 	void Update ()
@@ -49,20 +69,34 @@ public class GameController : MonoBehaviour
 			// Check who for a winner
 			if(playerOne.isWinner)
 			{
-				Debug.Log ("Player One Wins");
-				gameWinner = GameWinState.PLAYERONE;
-				sceneTransition.GoToGameComplete();
+				Debug.Log ("Player One Wins the Round");
+				PlayerPrefs.SetInt("PlayerOneWins", PlayerPrefs.GetInt("PlayerOneWins")+1);
+				ProcessRoundComplete();
 			}
 			else if(playerTwo.isWinner)
 			{
-				Debug.Log ("Player Two Wins");
-				gameWinner = GameWinState.PLAYERTWO;
-				sceneTransition.GoToGameComplete();
+				Debug.Log ("Player Two Wins the Round");
+				PlayerPrefs.SetInt("PlayerTwoWins", PlayerPrefs.GetInt("PlayerTwoWins")+1);
+				ProcessRoundComplete();
 			}
 		}
 
 		// Check for progression
 		CheckShrineProgress ();
+	}
+
+	private void ProcessRoundComplete()
+	{
+		// Check if we have reached last round
+		if(PlayerPrefs.GetInt("RoundNo") == roundCount || PlayerPrefs.GetInt("PlayerOneWins") >= 2 || PlayerPrefs.GetInt("PlayerTwoWins") >= 2)
+		{
+			// Go to game complete
+			sceneTransition.GoToGameComplete();
+		}
+		else
+		{
+			Application.LoadLevel(Application.loadedLevel);
+		}
 	}
 
 	private void InitialiseShrines()

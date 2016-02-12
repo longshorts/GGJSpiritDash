@@ -166,6 +166,11 @@ public class Portal : MonoBehaviour
 
 		// Flag its open state
 		isOpened = flag;
+
+		if(flag)
+		{
+			boxCollider.enabled = true;
+		}
 		
 		// Scale back rotation speeds
 		spiralSpeed /= 10.0f;
