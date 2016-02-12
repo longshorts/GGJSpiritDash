@@ -31,16 +31,11 @@ public class GameController : MonoBehaviour
 		playerOne = GameObject.FindGameObjectWithTag("Player1").GetComponent<PlayerController>();
 		playerTwo = GameObject.FindGameObjectWithTag("Player2").GetComponent<PlayerController>();
 
-		// Retrieve access to blue and red shrines
-		blueShrines = GameObject.FindGameObjectsWithTag("BlueShrine").ToList();
-		redShrines = GameObject.FindGameObjectsWithTag("RedShrine").ToList();
-
 		// Get a list of respawn points
 		gameRespawns = GameObject.FindGameObjectsWithTag("Respawn").ToList();
 
-		// Allocate shrines
-		GenerateListOfShrines(ref playerOne, blueShrines, redShrines, 3, 1);
-		GenerateListOfShrines(ref playerTwo, redShrines, blueShrines, 3, 1);
+		// Get a list of shrines and split them between the two players
+		InitialiseShrines();
 
 		// Flag we don't wanna destroy this when we move to the game win scene
 		DontDestroyOnLoad(this);
@@ -70,7 +65,26 @@ public class GameController : MonoBehaviour
 		CheckShrineProgress ();
 	}
 
-	void CheckShrineProgress()
+	private void InitialiseShrines()
+	{
+		// Retrieve access to blue and red shrines
+		blueShrines = GameObject.FindGameObjectsWithTag("BlueShrine").ToList();
+		redShrines = GameObject.FindGameObjectsWithTag("RedShrine").ToList();
+
+		// Make sure they are sorted by name
+		blueShrines = blueShrines.OrderBy(shrine => shrine.name).ToList();
+		redShrines = redShrines.OrderBy(shrine => shrine.name).ToList();
+
+		// Add static shrines to each player
+		playerOne.Objectives.Add(blueShrines[0].GetComponent<Shrine>());
+		playerTwo.Objectives.Add(redShrines[0].GetComponent<Shrine>());
+
+		// Allocate shrines
+		GenerateListOfShrines(ref playerOne, blueShrines, redShrines, 2, 1);
+		GenerateListOfShrines(ref playerTwo, redShrines, blueShrines, 2, 1);
+	}
+
+	private void CheckShrineProgress()
 	{
 		bool resultPlayer1, resultPlayer2;
 
@@ -142,17 +156,24 @@ public class GameController : MonoBehaviour
 
 	private void GenerateListOfShrines(ref PlayerController player, List<GameObject> listOne, List<GameObject> listTwo, int NoFromOne, int NoFromTwo)
 	{
-		// Randomise each list
+		// Create a list to store the objectives
+		List<GameObject> objectivesList = new List<GameObject>();
+
+		// Remove static one from the players list
+		listOne.Remove( listOne[0] );
+
+		// Shuffle both lists
 		listOne.Shuffle();
 		listTwo.Shuffle();
 
 		// Take x amount from each list
-		List<GameObject> objectivesList = new List<GameObject>();
 		objectivesList.AddRange( listOne.Take(NoFromOne) );
 		objectivesList.AddRange( listTwo.Take(NoFromTwo) );
+
+		listOne.RemoveRange(0, NoFromOne);
+		listTwo.RemoveRange(0, NoFromTwo);
 		
 		// Extract the shrine component from each shrine in the list and add to the objectives
-		player.Objectives = new List<Shrine>();
 		foreach(GameObject obj in objectivesList)
 		{
 			player.Objectives.Add(obj.GetComponent<Shrine>());

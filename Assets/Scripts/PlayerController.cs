@@ -7,7 +7,7 @@ public class PlayerController : MonoBehaviour
 	[Header("Properties")]
 	public float movementSpeed = 18.0f;
 	public int playerNumber = 1;
-	public List<Shrine> Objectives;
+	public List<Shrine> Objectives = new List<Shrine>();
 	public bool isComplete;
 	public bool isWinner;
 	private float maxRespawnTime = 1f;
@@ -32,8 +32,6 @@ public class PlayerController : MonoBehaviour
 	private KeyCode bombButton;
 	private KeyCode attackButton;
 
-	// Animation
-
 	// Movement
 	[Header("Movement")]
 	public Vector2 moveVelocity;
@@ -44,9 +42,10 @@ public class PlayerController : MonoBehaviour
 	private Rigidbody rigidBody;
 
 	// Components
+	[Header("Components")]
+	public GameController gameController;
 	private AbilityController abilityController;
 	private Animator animator;
-	private GameController gameController;
 
 	[Header("Audio")]
 	public AudioClip blockSound;
@@ -59,8 +58,7 @@ public class PlayerController : MonoBehaviour
 	void Start ()
 	{
 		// Access components
-		abilityController = gameObject.GetComponent<AbilityController>();
-		gameController = GameObject.Find ("GameController").GetComponent<GameController>();
+		abilityController = GetComponent<AbilityController>();
 		audioSource = GetComponent<AudioSource> ();
 		animator = GetComponent<Animator> ();
 		rigidBody = GetComponent<Rigidbody> ();
