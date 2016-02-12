@@ -9,31 +9,14 @@ public class GameCompleteUIManager : MonoBehaviour
 
 	void Start ()
 	{
-		GameObject controller = GameObject.Find ("GameController");
-		if(controller)
-		{
-			gameController = controller.GetComponent<GameController>();
-		}
-		else
-		{
-			return;
-		}
-
-		// Set the text
-		if(gameController.gameWinner == GameController.GameWinState.PLAYERONE)
+		// Check for the winner
+		if(PlayerPrefs.GetInt("PlayerOneWins") >= 2)
 		{
 			uiText.text = "GAME OVER\n\nPLAYER ONE WINS";
 		}
-		else if(gameController.gameWinner == GameController.GameWinState.PLAYERTWO)
+		else if(PlayerPrefs.GetInt("PlayerTwoWins") >= 2)
 		{
 			uiText.text = "GAME OVER\n\nPLAYER TWO WINS";
 		}
-		else
-		{
-			// WE SHOULDNT REACH THIS
-		}
-
-		// Destroy the game controller
-		Destroy (gameController.gameObject);
 	}
 }
