@@ -34,31 +34,6 @@ public class GameController : MonoBehaviour
 
 		// Get a list of shrines and split them between the two players
 		InitialiseShrines();
-
-		// Check what round we are on
-		if(PlayerPrefs.HasKey("RoundNo"))
-		{
-			// Reset round count
-			if(PlayerPrefs.GetInt("RoundNo") >= roundCount)
-			{
-				PlayerPrefs.SetInt("RoundNo", 1);
-				PlayerPrefs.SetInt("PlayerOneWins", 0);
-				PlayerPrefs.SetInt("PlayerTwoWins", 0);
-			}
-			else
-			{
-				// Increase round count
-				PlayerPrefs.SetInt("RoundNo", PlayerPrefs.GetInt("RoundNo") + 1);
-			}
-		}
-		else
-		{
-			// Initialise for first time
-			PlayerPrefs.SetInt("RoundNo", 1);
-			PlayerPrefs.SetInt("PlayerOneWins", 0);
-			PlayerPrefs.SetInt("PlayerTwoWins", 0);
-		}
-		Debug.Log ("Round : " + PlayerPrefs.GetInt("RoundNo"));
 	}
 
 	void Update ()
@@ -85,18 +60,33 @@ public class GameController : MonoBehaviour
 		CheckShrineProgress ();
 	}
 
-	private void ProcessRoundComplete()
+	private void InitialiseRounds()
 	{
-		// Check if we have reached last round
-		if(PlayerPrefs.GetInt("RoundNo") == roundCount || PlayerPrefs.GetInt("PlayerOneWins") >= 2 || PlayerPrefs.GetInt("PlayerTwoWins") >= 2)
+		// Check what round we are on
+		if(PlayerPrefs.HasKey("RoundNo"))
 		{
-			// Go to game complete
-			sceneTransition.GoToGameComplete();
+			// Reset round count
+			if(PlayerPrefs.GetInt("RoundNo") >= roundCount)
+			{
+				PlayerPrefs.SetInt("RoundNo", 1);
+				PlayerPrefs.SetInt("PlayerOneWins", 0);
+				PlayerPrefs.SetInt("PlayerTwoWins", 0);
+			}
+			else
+			{
+				// Increase round count
+				PlayerPrefs.SetInt("RoundNo", PlayerPrefs.GetInt("RoundNo") + 1);
+			}
 		}
 		else
 		{
-			Application.LoadLevel(Application.loadedLevel);
+			// Initialise for first time
+			PlayerPrefs.SetInt("RoundNo", 1);
+			PlayerPrefs.SetInt("PlayerOneWins", 0);
+			PlayerPrefs.SetInt("PlayerTwoWins", 0);
 		}
+
+		Debug.Log ("Round : " + PlayerPrefs.GetInt("RoundNo"));
 	}
 
 	private void InitialiseShrines()
@@ -112,6 +102,8 @@ public class GameController : MonoBehaviour
 		// Add static shrines to each player
 		playerOne.Objectives.Add(blueShrines[0].GetComponent<Shrine>());
 		playerTwo.Objectives.Add(redShrines[0].GetComponent<Shrine>());
+		blueShrines.Remove(blueShrines[0]);
+		redShrines.Remove(redShrines[0]);
 
 		// Allocate shrines
 		GenerateListOfShrines(ref playerOne, blueShrines, redShrines, 2, 1);
@@ -148,6 +140,20 @@ public class GameController : MonoBehaviour
 					portalActivated = false;
 				}
 			}
+		}
+	}
+	
+	private void ProcessRoundComplete()
+	{
+		// Check if we have reached last round
+		if(PlayerPrefs.GetInt("RoundNo") == roundCount || PlayerPrefs.GetInt("PlayerOneWins") >= 2 || PlayerPrefs.GetInt("PlayerTwoWins") >= 2)
+		{
+			// Go to game complete
+			sceneTransition.GoToGameComplete();
+		}
+		else
+		{
+			Application.LoadLevel(Application.loadedLevel);
 		}
 	}
 
@@ -192,9 +198,6 @@ public class GameController : MonoBehaviour
 	{
 		// Create a list to store the objectives
 		List<GameObject> objectivesList = new List<GameObject>();
-
-		// Remove static one from the players list
-		listOne.Remove( listOne[0] );
 
 		// Shuffle both lists
 		listOne.Shuffle();
