@@ -159,9 +159,9 @@ public class GameController : MonoBehaviour
 
 	public void GetRespawnLocation(GameObject player)
 	{
-		// Update player position to a random respawn point
-		player.transform.position = gameRespawns[Random.Range(0, gameRespawns.Count - 1)].transform.position;
-	}
+        // Update player position to a random respawn point
+        player.transform.position = gameRespawns[Random.Range(0, gameRespawns.Count - 1)].transform.position;
+    }
 
 	private bool CheckPlayerWin(ref PlayerController player, Shrine.CaptureState state)
 	{

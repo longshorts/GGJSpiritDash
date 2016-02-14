@@ -24,6 +24,7 @@ public class PlayerController : MonoBehaviour
 	private KeyCode dashKey;
 	private KeyCode bombKey;
 	private KeyCode attackKey;
+    private KeyCode dropBlockKey;
 
 	[Header("Xbox Input")]
 	private KeyCode freezeButton;
@@ -31,6 +32,7 @@ public class PlayerController : MonoBehaviour
 	private KeyCode dashButton;
 	private KeyCode bombButton;
 	private KeyCode attackButton;
+    private KeyCode dropBlockButton;
 
 	// Movement
 	[Header("Movement")]
@@ -57,14 +59,15 @@ public class PlayerController : MonoBehaviour
 
 	void Start ()
 	{
-		// Access components
+
+        // Access components
 		abilityController = GetComponent<AbilityController>();
 		audioSource = GetComponent<AudioSource> ();
 		animator = GetComponent<Animator> ();
 		rigidBody = GetComponent<Rigidbody> ();
-	
-		// Set input keys
-		AssignInput();
+
+        // Set input keys
+        AssignInput();
 
 		// Initialise animation
 		isFrozen = false;
@@ -93,11 +96,13 @@ public class PlayerController : MonoBehaviour
 				blockKey = KeyCode.Alpha3;
 				bombKey = KeyCode.Alpha4;
 				attackKey = KeyCode.Alpha5;
+                dropBlockButton = KeyCode.Alpha6;
 				freezeButton = KeyCode.Joystick1Button0;
 				dashButton = KeyCode.Joystick1Button1;
 				blockButton = KeyCode.Joystick1Button2;
 				bombButton = KeyCode.Joystick1Button3;
 				attackButton = KeyCode.Joystick1Button5;
+                dropBlockButton = KeyCode.Joystick1Button4;
 				break;
 
 			case 2:
@@ -108,6 +113,7 @@ public class PlayerController : MonoBehaviour
 				freezeKey = KeyCode.Alpha9;
 				dashKey = KeyCode.Alpha0;
 				attackKey = KeyCode.Alpha8;
+                dropBlockKey = KeyCode.Alpha7;
 				blockKey = KeyCode.Minus;
 				bombKey = KeyCode.Equals;
 				freezeButton = KeyCode.Joystick2Button0;
@@ -115,6 +121,7 @@ public class PlayerController : MonoBehaviour
 				blockButton = KeyCode.Joystick2Button2;
 				bombButton = KeyCode.Joystick2Button3;
 				attackButton = KeyCode.Joystick2Button5;
+                dropBlockButton = KeyCode.Joystick2Button4;
 				break;
 			
 			default:
@@ -208,15 +215,18 @@ public class PlayerController : MonoBehaviour
 		CastAbility(abilityController.Freeze, freezeKey, freezeSound, 0.7f);
 		CastAbility(abilityController.Dash, dashKey, dashSound, 0.7f);
 		CastAbility(abilityController.Block, blockKey, blockSound, 0.7f);
-		CastAbility(abilityController.Bomb, bombKey, bombSound, 0.7f);
+        CastAbility(abilityController.Block, dropBlockKey, blockSound, 0.7f);
+        CastAbility(abilityController.Bomb, bombKey, bombSound, 0.7f);
 		CastAbility(abilityController.Attack, attackKey, attackSound, 0.7f);
 
 		// Xbox
 		CastAbility(abilityController.Freeze, freezeButton, freezeSound, 0.7f);
 		CastAbility(abilityController.Dash, dashButton, dashSound, 0.7f);
 		CastAbility(abilityController.Block, blockButton, blockSound, 0.7f);
-		CastAbility(abilityController.Bomb, bombButton, bombSound, 0.7f);
+        CastAbility(abilityController.Block, dropBlockButton, blockSound, 0.7f);
+        CastAbility(abilityController.Bomb, bombButton, bombSound, 0.7f);
 		CastAbility(abilityController.Attack, attackButton, attackSound, 0.7f);
+        
 	}
 
 	private void CastAbility(Ability ability, KeyCode key, AudioClip clip, float volume)
@@ -229,9 +239,18 @@ public class PlayerController : MonoBehaviour
 		if(!Input.GetKeyDown(key))
 			return;
 
-		// Use ability
-		ability.UseAbility();
-
+        // If the button pressed was the drop block button
+        if (key == dropBlockButton | key == dropBlockKey)
+        {
+            // Drop the block
+            abilityController.Block.DropBlock();
+        }
+        else
+        {
+            // Use ability
+            ability.UseAbility();
+        }
+		
 		// Play audio
 		audioSource.PlayOneShot(clip, volume);
 	}
@@ -311,11 +330,11 @@ public class PlayerController : MonoBehaviour
 
 	private void Respawn()
 	{
-		// Find the closest respawn point
-		gameController.GetRespawnLocation(gameObject);
+        // Find the closest respawn point
+        gameController.GetRespawnLocation(gameObject);
 
-		// Reset player allowing thme to move
-		isAlive = true;
+        // Reset player allowing thme to move
+        isAlive = true;
 		GetComponent<Renderer>().enabled = isAlive;
 		GetComponent<Animator>().enabled = isAlive;
 		GetComponent<Collider>().enabled = isAlive;
