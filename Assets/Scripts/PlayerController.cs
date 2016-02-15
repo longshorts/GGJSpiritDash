@@ -234,7 +234,7 @@ public class PlayerController : MonoBehaviour
 		CastAbility(abilityController.Freeze, freezeButton, freezeSound, 0.7f);
 		CastAbility(abilityController.Dash, dashButton, dashSound, 0.7f);
 		CastAbility(abilityController.Block, blockButton, blockSound, 0.7f);
-        CastAbility(abilityController.Block, attackButton, blockSound, 0.7f);
+        //CastAbility(abilityController.Block, attackButton, blockSound, 0.7f);
         CastAbility(abilityController.Bomb, bombButton, bombSound, 0.7f);
 		CastAbility(abilityController.Attack, attackButton, attackSound, 0.7f);
         
