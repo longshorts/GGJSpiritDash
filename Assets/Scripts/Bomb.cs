@@ -29,15 +29,19 @@ public class Bomb : MonoBehaviour
 		animator = GetComponent<Animator> ();
 	}
 
-	void OnCollisionEnter(Collision collision)
+	void OnTriggerEnter(Collider collision)
 	{
-		// Trigger explosion
-		animator.SetTrigger("Explode");
-		IsExploding = true;
-		rigidBody.velocity = new Vector3();
+		if(!IsExploding)
+		{
+			// Trigger explosion
+			animator.SetTrigger("Explode");
+			IsExploding = true;
+			rigidBody.velocity = new Vector3();
+			GetComponent<SphereCollider>().radius = explosionRadius;
 		
-		// Wait for animation to finish then destroy
-		StartCoroutine(Explode());
+			// Wait for animation to finish then destroy
+			StartCoroutine(Explode());
+		}
 
 		// Loop through the colliders
 		if(collision.gameObject.tag == "Player1" || collision.gameObject.tag == "Player2")

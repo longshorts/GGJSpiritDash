@@ -342,7 +342,7 @@ public class PlayerController : MonoBehaviour
 
 		finalForce = Mathf.Lerp(force, 0, t);
 
-		transform.position = Vector3.Lerp (transform.position, transform.position + (direction*finalForce), t);
+		transform.position = transform.position + (direction*finalForce);
 	}
 
 	//Kills this player. Returns false if player already dead.
