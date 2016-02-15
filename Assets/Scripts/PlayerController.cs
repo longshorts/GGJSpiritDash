@@ -7,39 +7,49 @@ public class PlayerController : MonoBehaviour
 	[Header("Properties")]
 	public float movementSpeed = 18.0f;
 	public int playerNumber = 1;
+	public List<Shrine> Objectives = new List<Shrine>();
+	public bool isComplete;
+	public bool isWinner;
+	private float maxRespawnTime = 1f;
+	private float respawnTimer = 0.0f;
+	private bool isAlive = true;
 
-	// Window Keys
+	[Header("Windows Input")]
 	private KeyCode upKey;
 	private KeyCode downKey;
 	private KeyCode leftKey;
 	private KeyCode rightKey;
-
 	private KeyCode freezeKey;
 	private KeyCode blockKey;
 	private KeyCode dashKey;
 	private KeyCode bombKey;
 	private KeyCode attackKey;
+    private KeyCode dropBlockKey;
 
-	// Xbox Controller
+	[Header("Xbox Input")]
 	private KeyCode freezeButton;
 	private KeyCode blockButton;
 	private KeyCode dashButton;
 	private KeyCode bombButton;
 	private KeyCode attackButton;
-
-	private Animator animator;
+    private KeyCode dropBlockButton;
 
 	// Movement
+	[Header("Movement")]
 	public Vector2 moveVelocity;
 	public bool isFrozen;
 	public bool controlsLocked;
-	private Rigidbody rigidBody;
-
 	public Vector3 directionVector3D;
 	public Vector3 directionVector2D;
+	private Rigidbody rigidBody;
 
+	// Components
+	[Header("Components")]
+	public GameController gameController;
 	private AbilityController abilityController;
+	private Animator animator;
 
+	[Header("Audio")]
 	public AudioClip blockSound;
 	public AudioClip bombSound;
 	public AudioClip dashSound;
@@ -47,23 +57,19 @@ public class PlayerController : MonoBehaviour
 	public AudioClip attackSound;
 	private AudioSource audioSource;
 
-	//Kill/Respawn
-	private float maxRespawnTime = 1f;
-	private float respawnTimer = 0.0f;
-	private bool isAlive = true;
-
 	void Start ()
 	{
-		// assign the character rigid body to this movement script
+
+        // Access components
+		abilityController = GetComponent<AbilityController>();
+		audioSource = GetComponent<AudioSource> ();
+		animator = GetComponent<Animator> ();
 		rigidBody = GetComponent<Rigidbody> ();
-	
-		// Set input keys
-		AssignInput();
 
-		// Access abilties
-		abilityController = gameObject.GetComponent<AbilityController>();
+        // Set input keys
+        AssignInput();
 
-		// Initialise to unfrozen
+		// Initialise animation
 		isFrozen = false;
 		animator.SetBool ("isFrozen", isFrozen);
 
@@ -71,8 +77,9 @@ public class PlayerController : MonoBehaviour
 		directionVector3D = new Vector3 (0, 0, -1);		// World Space
 		directionVector2D = new Vector3(0, -1, 0);		// Local 2D
 
-		// Initialise audio
-		audioSource = GetComponent<AudioSource> ();
+		// Initialise
+		isComplete = false;
+		isWinner = false;
 	}
 
 	private void AssignInput()
@@ -89,11 +96,13 @@ public class PlayerController : MonoBehaviour
 				blockKey = KeyCode.Alpha3;
 				bombKey = KeyCode.Alpha4;
 				attackKey = KeyCode.Alpha5;
+                dropBlockButton = KeyCode.Alpha6;
 				freezeButton = KeyCode.Joystick1Button0;
 				dashButton = KeyCode.Joystick1Button1;
 				blockButton = KeyCode.Joystick1Button2;
 				bombButton = KeyCode.Joystick1Button3;
 				attackButton = KeyCode.Joystick1Button5;
+                dropBlockButton = KeyCode.Joystick1Button4;
 				break;
 
 			case 2:
@@ -104,6 +113,7 @@ public class PlayerController : MonoBehaviour
 				freezeKey = KeyCode.Alpha9;
 				dashKey = KeyCode.Alpha0;
 				attackKey = KeyCode.Alpha8;
+                dropBlockKey = KeyCode.Alpha7;
 				blockKey = KeyCode.Minus;
 				bombKey = KeyCode.Equals;
 				freezeButton = KeyCode.Joystick2Button0;
@@ -111,14 +121,13 @@ public class PlayerController : MonoBehaviour
 				blockButton = KeyCode.Joystick2Button2;
 				bombButton = KeyCode.Joystick2Button3;
 				attackButton = KeyCode.Joystick2Button5;
+                dropBlockButton = KeyCode.Joystick2Button4;
 				break;
 			
 			default:
 				Debug.LogError ("Unknown playerNumber, input not set");
 				break;
 		}
-		
-		animator = GetComponent<Animator> ();
 	}
 	
 	// Update is called once per frame
@@ -132,7 +141,7 @@ public class PlayerController : MonoBehaviour
 		if(isFrozen)
 			return;
 
-		if (checkRespawn())
+		if (CheckRespawn())
 			Respawn ();
 
 		if (!isAlive)
@@ -206,15 +215,18 @@ public class PlayerController : MonoBehaviour
 		CastAbility(abilityController.Freeze, freezeKey, freezeSound, 0.7f);
 		CastAbility(abilityController.Dash, dashKey, dashSound, 0.7f);
 		CastAbility(abilityController.Block, blockKey, blockSound, 0.7f);
-		CastAbility(abilityController.Bomb, bombKey, bombSound, 0.7f);
+        CastAbility(abilityController.Block, dropBlockKey, blockSound, 0.7f);
+        CastAbility(abilityController.Bomb, bombKey, bombSound, 0.7f);
 		CastAbility(abilityController.Attack, attackKey, attackSound, 0.7f);
 
 		// Xbox
 		CastAbility(abilityController.Freeze, freezeButton, freezeSound, 0.7f);
 		CastAbility(abilityController.Dash, dashButton, dashSound, 0.7f);
 		CastAbility(abilityController.Block, blockButton, blockSound, 0.7f);
-		CastAbility(abilityController.Bomb, bombButton, bombSound, 0.7f);
+        CastAbility(abilityController.Block, dropBlockButton, blockSound, 0.7f);
+        CastAbility(abilityController.Bomb, bombButton, bombSound, 0.7f);
 		CastAbility(abilityController.Attack, attackButton, attackSound, 0.7f);
+        
 	}
 
 	private void CastAbility(Ability ability, KeyCode key, AudioClip clip, float volume)
@@ -227,9 +239,18 @@ public class PlayerController : MonoBehaviour
 		if(!Input.GetKeyDown(key))
 			return;
 
-		// Use ability
-		ability.UseAbility();
-
+        // If the button pressed was the drop block button
+        if (key == dropBlockButton | key == dropBlockKey)
+        {
+            // Drop the block
+            abilityController.Block.DropBlock();
+        }
+        else
+        {
+            // Use ability
+            ability.UseAbility();
+        }
+		
 		// Play audio
 		audioSource.PlayOneShot(clip, volume);
 	}
@@ -277,39 +298,43 @@ public class PlayerController : MonoBehaviour
 	}
 
 	//Kills this player. Returns false if player already dead.
-	public bool Kill(){
-		if (isAlive) {
+	public bool Kill()
+	{
+		if (isAlive)
+		{
 			isAlive = false;
 			respawnTimer = 0.0f;
 			GetComponent<Renderer>().enabled = isAlive;
 			GetComponent<Animator>().enabled = isAlive;
 			GetComponent<Collider>().enabled = isAlive;
 			return true;
-		} else
+		}
+		else
+		{
 			return false;
-
+		}
 	}
 
-	private bool checkRespawn(){
+	private bool CheckRespawn()
+	{
 		if (!isAlive && respawnTimer >= maxRespawnTime)
+		{
 			return true;
-		else {
+		}
+		else
+		{
 			respawnTimer += Time.deltaTime;
 			return false;
 		}
 	}
 
-	private void Respawn(){
-		GameObject spawn = GameObject.Find ("Player" + playerNumber + "Spawn");
+	private void Respawn()
+	{
+        // Find the closest respawn point
+        gameController.GetRespawnLocation(gameObject);
 
-		if (spawn != null) {
-			transform.position = spawn.transform.position;
-		} else {
-			Debug.LogError ("Cannot Respawn! No spawn location prefab for player" + playerNumber);
-			return;
-		}
-
-		isAlive = true;
+        // Reset player allowing thme to move
+        isAlive = true;
 		GetComponent<Renderer>().enabled = isAlive;
 		GetComponent<Animator>().enabled = isAlive;
 		GetComponent<Collider>().enabled = isAlive;

@@ -5,141 +5,215 @@ using System.Linq;
 
 public class GameController : MonoBehaviour
 {
-	public enum GameWinState { PLAYERONE, PLAYERTWO, DRAW };
-
 	[Header("Game Properties")]
-	public int shrinesRequired = 5;		// shrines required to win
-	public int maxShrines = 12;			// how many shrines in the level
-	public bool isRunning;			// whether the level is isRunning
+	public int shrinesRequired = 4;							// Shrines required to win
+	public int roundCount = 3;								// Number of rounds
+	public bool portalActivated = false;					// Flag for whether portal is open or not
 
 	[Header("Objects")]
-	public Player playerOne;
-	public Player playerTwo;
-	public List<Shrine> gameShrines;	// array of references to shrine scripts
-	public Portal portal;
-	public GameWinState gameWinner;	// Who won
+	public PlayerController playerOne;			// Access to player one
+	public PlayerController playerTwo;			// Access to player one
+	public List<GameObject> gameRespawns;		// List of spawn points
+	public List<GameObject> blueShrines;		// List of blue player shrines
+	public List<GameObject> redShrines;			// List of red player shrines
+	public Portal portal;						// Access to portal object
 
-	private SceneTransition sceneTransition;
+	private SceneTransition sceneTransition;	// Scene switching
 	
 	void Start ()
 	{
-		// initialize game state variables
-		isRunning = false;
+		// Initialize game state variables
 		sceneTransition = GetComponent<SceneTransition> ();
 
 		// Initialise Players
-		playerOne = GameObject.FindGameObjectWithTag("Player1").GetComponent<Player>();
-		playerTwo = GameObject.FindGameObjectWithTag("Player2").GetComponent<Player>();
+		playerOne = GameObject.FindGameObjectWithTag("Player1").GetComponent<PlayerController>();
+		playerTwo = GameObject.FindGameObjectWithTag("Player2").GetComponent<PlayerController>();
 
-		// Retrieve gameobjects for our shrines
-		GameObject[] shrine = GameObject.FindGameObjectsWithTag("Shrine");
+		// Get a list of respawn points
+		gameRespawns = GameObject.FindGameObjectsWithTag("Respawn").ToList();
 
-		// Compile list of shrine capture scripts
-		gameShrines = new List<Shrine>();
-		foreach(GameObject obj in shrine)
-		{
-			gameShrines.Add (obj.GetComponent<Shrine>());
-		}
-
-		// Allocate shrines
-		AllocateShrines();
-
-		// Flag we are playing
-		isRunning = true;
-
-		// Flag we don't wanna destroy this
-		DontDestroyOnLoad(this);
+		// Get a list of shrines and split them between the two players
+		InitialiseShrines();
 	}
-	
-	// Update is called once per frame
+
 	void Update ()
 	{
-		// if this is the first cycle of this match
-		if (!isRunning)
+		// Check for the winner for the game
+		if(portalActivated)
 		{
-			return;
+			// Check who for a winner
+			if(playerOne.isWinner)
+			{
+				Debug.Log ("Player One Wins the Round");
+				PlayerPrefs.SetInt("PlayerOneWins", PlayerPrefs.GetInt("PlayerOneWins")+1);
+				ProcessRoundComplete();
+			}
+			else if(playerTwo.isWinner)
+			{
+				Debug.Log ("Player Two Wins the Round");
+				PlayerPrefs.SetInt("PlayerTwoWins", PlayerPrefs.GetInt("PlayerTwoWins")+1);
+				ProcessRoundComplete();
+			}
 		}
 
-		// Check if either player has won
-		if(playerOne.Victory)
+		// Check for progression
+		CheckShrineProgress ();
+	}
+
+	private void InitialiseRounds()
+	{
+		// Check what round we are on
+		if(PlayerPrefs.HasKey("RoundNo"))
 		{
-			gameWinner = GameWinState.PLAYERONE;
-			isRunning = false;
-			sceneTransition.GoToGameComplete ();
+			// Reset round count
+			if(PlayerPrefs.GetInt("RoundNo") >= roundCount)
+			{
+				PlayerPrefs.SetInt("RoundNo", 1);
+				PlayerPrefs.SetInt("PlayerOneWins", 0);
+				PlayerPrefs.SetInt("PlayerTwoWins", 0);
+			}
+			else
+			{
+				// Increase round count
+				PlayerPrefs.SetInt("RoundNo", PlayerPrefs.GetInt("RoundNo") + 1);
+			}
 		}
-		else if(playerTwo.Victory)
+		else
 		{
-			gameWinner = GameWinState.PLAYERTWO;
-			isRunning = false;
+			// Initialise for first time
+			PlayerPrefs.SetInt("RoundNo", 1);
+			PlayerPrefs.SetInt("PlayerOneWins", 0);
+			PlayerPrefs.SetInt("PlayerTwoWins", 0);
+		}
+
+		Debug.Log ("Round : " + PlayerPrefs.GetInt("RoundNo"));
+	}
+
+	private void InitialiseShrines()
+	{
+		// Retrieve access to blue and red shrines
+		blueShrines = GameObject.FindGameObjectsWithTag("BlueShrine").ToList();
+		redShrines = GameObject.FindGameObjectsWithTag("RedShrine").ToList();
+
+		// Make sure they are sorted by name
+		blueShrines = blueShrines.OrderBy(shrine => shrine.name).ToList();
+		redShrines = redShrines.OrderBy(shrine => shrine.name).ToList();
+
+		// Add static shrines to each player
+		playerOne.Objectives.Add(blueShrines[0].GetComponent<Shrine>());
+		playerTwo.Objectives.Add(redShrines[0].GetComponent<Shrine>());
+		blueShrines.Remove(blueShrines[0]);
+		redShrines.Remove(redShrines[0]);
+
+		// Allocate shrines
+		GenerateListOfShrines(ref playerOne, blueShrines, redShrines, 2, 1);
+		GenerateListOfShrines(ref playerTwo, redShrines, blueShrines, 2, 1);
+	}
+
+	private void CheckShrineProgress()
+	{
+		bool resultPlayer1, resultPlayer2;
+
+		// Check how many shrines have been collected by each player
+		resultPlayer1 = CheckPlayerWin(ref playerOne, Shrine.CaptureState.PLAYERONE);
+		resultPlayer2 = CheckPlayerWin(ref playerTwo, Shrine.CaptureState.PLAYERTWO);
+
+		// Check if either player has captured their objectives
+		if(resultPlayer1 || resultPlayer2)
+		{
+			// Activate the portal if it hasnt already been
+			if(!portalActivated)
+			{
+				portal.Activate();
+				portalActivated = true;
+			}
+		}
+		else
+		{
+			// If both players havent captured their objectives
+			if(!resultPlayer1 && !resultPlayer2)
+			{
+				if(portalActivated)
+				{
+					// Deactivate portal
+					portal.Deactivate();
+					portalActivated = false;
+				}
+			}
+		}
+	}
+	
+	private void ProcessRoundComplete()
+	{
+		// Check if we have reached last round
+		if(PlayerPrefs.GetInt("RoundNo") == roundCount || PlayerPrefs.GetInt("PlayerOneWins") >= 2 || PlayerPrefs.GetInt("PlayerTwoWins") >= 2)
+		{
+			// Go to game complete
 			sceneTransition.GoToGameComplete();
 		}
 		else
 		{
-			// check whether the player controls all of their shrines
-			CheckProgress ();
+			Application.LoadLevel(Application.loadedLevel);
 		}
 	}
 
-	void CheckProgress()
+	public void GetRespawnLocation(GameObject player)
 	{
-		// Check how many shrines have been collected by each player
-		CheckPlayerWin(ref playerOne, Shrine.CaptureState.PLAYERONE);
-		CheckPlayerWin(ref playerTwo, Shrine.CaptureState.PLAYERTWO);
+        // Update player position to a random respawn point
+        player.transform.position = gameRespawns[Random.Range(0, gameRespawns.Count - 1)].transform.position;
+    }
 
-		if(playerOne.Complete || playerTwo.Complete)
-		{
-			portal.Activate();
-		}
-	}
-
-	private void CheckPlayerWin(ref Player player, Shrine.CaptureState state)
+	private bool CheckPlayerWin(ref PlayerController player, Shrine.CaptureState state)
 	{
-		int Count = 0;
-		
+		int capturedCount = 0;
+
+		// Loop through each shrine and check their owner
 		foreach(Shrine shrine in player.Objectives)
 		{
-			if(shrine.ownerState == state)
+			if(shrine.IsCaptured() && shrine.ownerState.Equals(state))
 			{
-				if(shrine.IsCaptured())
-					Count++;
+				capturedCount++;
 			}
 		}
-		
-		if(Count >= shrinesRequired)
+
+		// Check if we have won
+		if(capturedCount.Equals(shrinesRequired))
 		{
-			player.Complete = true;
+			// Flag the player has captured their objectives
+			player.isComplete = true;
+
+			return true;
 		}
-	}
-
-	private void AllocateShrines()
-	{
-		// Shuffle the list
-		gameShrines.Shuffle();
-
-		// Take the number of shrines we need
-		Shrine[] playerOneShrines = gameShrines.Take(shrinesRequired).ToArray();
-
-		// Shuffle the list
-		gameShrines.Shuffle();
-
-		// Take the number of shrines we need
-		Shrine[] playerTwoShrines = gameShrines.Take(shrinesRequired).ToArray();
-
-		// Give the objectives to the player
-		AllocateShrinesToPlayer(ref playerOne, playerOneShrines);
-		AllocateShrinesToPlayer(ref playerTwo, playerTwoShrines);
-	}
-	
-	private void AllocateShrinesToPlayer(ref Player player, Shrine[] PlayerShrines)
-	{
-		// Initialise list
-		player.Objectives = new List<Shrine>();
-
-		// Loop through each generated shrine
-		for(int i = 0; i < PlayerShrines.Length; i++)
+		else
 		{
-			// Add to the objectives
-			player.Objectives.Add(PlayerShrines[i]);
+			// Deactivate player winning
+			player.isComplete = false;
+			player.isWinner = false;
+		}
+
+		return false;
+	}
+
+	private void GenerateListOfShrines(ref PlayerController player, List<GameObject> listOne, List<GameObject> listTwo, int NoFromOne, int NoFromTwo)
+	{
+		// Create a list to store the objectives
+		List<GameObject> objectivesList = new List<GameObject>();
+
+		// Shuffle both lists
+		listOne.Shuffle();
+		listTwo.Shuffle();
+
+		// Take x amount from each list
+		objectivesList.AddRange( listOne.Take(NoFromOne) );
+		objectivesList.AddRange( listTwo.Take(NoFromTwo) );
+
+		listOne.RemoveRange(0, NoFromOne);
+		listTwo.RemoveRange(0, NoFromTwo);
+		
+		// Extract the shrine component from each shrine in the list and add to the objectives
+		foreach(GameObject obj in objectivesList)
+		{
+			player.Objectives.Add(obj.GetComponent<Shrine>());
 		}
 	}
 }

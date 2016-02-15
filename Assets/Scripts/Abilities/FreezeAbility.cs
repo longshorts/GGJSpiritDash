@@ -17,18 +17,6 @@ public class FreezeAbility : Ability
 
 	void Start()
 	{
-		// Get access to the opposing player
-		if(gameObject.tag.Equals("Player1"))
-		{
-			targetPlayer = GameObject.FindGameObjectWithTag("Player2");
-			playerController = targetPlayer.GetComponent<PlayerController>();
-		}
-		else if(gameObject.tag.Equals("Player2"))
-		{
-			targetPlayer = GameObject.FindGameObjectWithTag("Player1");
-			playerController = targetPlayer.GetComponent<PlayerController>();
-		}
-
 		// Define target scale from radius
 		targetScale = new Vector3(freezeRadius, freezeRadius, freezeRadius);
 
@@ -45,16 +33,29 @@ public class FreezeAbility : Ability
 		sphereCollider.radius = 0.0f;
 	}
 
+	void Update()
+	{
+		if(!frostEffect.activeSelf)
+			return;
+
+		// Force it to follow player
+		frostEffect.transform.position = transform.position;
+	}
+
 	void OnTriggerEnter(Collider collider)
 	{
-		// Make sure the collider isn't ours and its not a trigger
-		if(collider.gameObject.tag.Equals(targetPlayer.gameObject.tag) && !collider.isTrigger)
+		// Make sure we aren't colliding with ourselves or something that cant be frozen
+		if(!collider.gameObject.tag.Equals(gameObject.tag) && !collider.isTrigger)
 		{
-			// If the player isnt already frozen
-			if(!playerController.isFrozen)
+			// Ensure it has a playercontroller script
+			PlayerController targetController = collider.gameObject.GetComponent<PlayerController>();
+			if(targetController)
 			{
-				// Freeze player
-				StartCoroutine(FreezePlayer(collider.gameObject));
+				if(!targetController.isFrozen)
+				{
+					// Freeze player
+					StartCoroutine(FreezePlayer(collider.gameObject));
+				}
 			}
 		}
 	}

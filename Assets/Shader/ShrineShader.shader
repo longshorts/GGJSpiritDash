@@ -2,7 +2,6 @@
 {
     Properties
     {
-        _MainTex ("Base Texture", 2D) = "white" {}
         _IconTex ("Icon Texture", 2D) = "white" {}
         _IconColour("Icon Progress", Color) = (1,0,0,0)
     }
@@ -10,23 +9,20 @@
     {
     
         Pass
-        {
-            // Apply base texture
-            SetTexture [_MainTex]
-            {
-                combine texture
-            }
+        {       
+            AlphaTest Greater 0.5
             
             // Blend in the alpha texture using the lerp operator
             SetTexture [_IconTex]
             {
-            	constantColor[_IconColour]
-                combine constant lerp(texture) texture
+                constantColor [_IconColour]
+                combine constant lerp(texture) previous
             }
             
-            SetTexture [_MainTex]
+            // Multiply in texture
+            SetTexture [_IconTex] 
             {
-            	combine previous lerp(previous) texture
+                combine previous * texture
             }
         }
     }
