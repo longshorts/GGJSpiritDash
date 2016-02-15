@@ -351,9 +351,10 @@ public class PlayerController : MonoBehaviour
 		if (isAlive)
 		{
 			isAlive = false;
+			animator.SetBool ("dead", true);
 			respawnTimer = 0.0f;
-			GetComponent<Renderer>().enabled = isAlive;
-			GetComponent<Animator>().enabled = isAlive;
+			//GetComponent<Renderer>().enabled = isAlive;
+			//GetComponent<Animator>().enabled = isAlive;
 			GetComponent<Collider>().enabled = isAlive;
 			return true;
 		}
@@ -383,8 +384,9 @@ public class PlayerController : MonoBehaviour
 
         // Reset player allowing thme to move
         isAlive = true;
-		GetComponent<Renderer>().enabled = isAlive;
-		GetComponent<Animator>().enabled = isAlive;
+		animator.SetBool ("dead", false);
+		//GetComponent<Renderer>().enabled = isAlive;
+		//GetComponent<Animator>().enabled = isAlive;
 		GetComponent<Collider>().enabled = isAlive;
 	}
 
