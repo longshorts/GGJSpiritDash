@@ -13,6 +13,8 @@ public class AttackAbility : Ability
 	private float slashFrame = 0.0f;
 	private GameObject attackVisual;
 
+	private Animator animator;
+
 	void Start()
 	{
 		// Get access to the opposing player
@@ -29,6 +31,8 @@ public class AttackAbility : Ability
 		attackVisual = (GameObject)Instantiate(attackPrefab);
 		attackVisual.name = "Frost - " + tag;
 		attackVisual.SetActive(false);
+
+		animator = GetComponent<Animator> ();
 	}
 
 	void Update()
@@ -43,7 +47,7 @@ public class AttackAbility : Ability
 	public override void CastAbility ()
 	{
 		// Show the visual
-		attackVisual.SetActive(true);
+		/*attackVisual.SetActive(true);
 		attackVisual.transform.position = transform.position + (GetComponent<PlayerController>().directionVector3D * attackRange);
 		attackVisual.transform.rotation = transform.rotation;
 		Vector3 scale = attackVisual.transform.localScale;
@@ -54,7 +58,9 @@ public class AttackAbility : Ability
 		slashFrame = 0.0f;
 
 		// Show the slash
-		StartCoroutine(ShowSlash());
+		StartCoroutine(ShowSlash());*/
+
+		animator.SetTrigger ("attack");
 
 		// Attack forward
 		SlashForward();
