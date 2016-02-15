@@ -33,6 +33,7 @@ public class PlayerController : MonoBehaviour
 	private KeyCode bombButton;
 	private KeyCode attackButton;
     private KeyCode dropBlockButton;
+    private bool attack = false;
 
 	// Movement
 	[Header("Movement")]
@@ -164,6 +165,16 @@ public class PlayerController : MonoBehaviour
 		// XBOX CONTROLLER
 		float h = Input.GetAxis ("HorizontalLeftAnalogP" + playerNumber);
 		float v = Input.GetAxis ("VerticalLeftAnalogP" + playerNumber);
+        float a = Input.GetAxis("AttackP" + playerNumber);
+
+        if (a > 0)
+        {
+            attack = true;
+        }
+        else
+        {
+            attack = false;
+        }
 
 		moveVelocity.x = h;
 		moveVelocity.y = v * -1;
@@ -223,7 +234,7 @@ public class PlayerController : MonoBehaviour
 		CastAbility(abilityController.Freeze, freezeButton, freezeSound, 0.7f);
 		CastAbility(abilityController.Dash, dashButton, dashSound, 0.7f);
 		CastAbility(abilityController.Block, blockButton, blockSound, 0.7f);
-        CastAbility(abilityController.Block, attackButton, blockSound, 0.7f);
+        //CastAbility(abilityController.Block, attackButton, blockSound, 0.7f);
         CastAbility(abilityController.Bomb, bombButton, bombSound, 0.7f);
 		CastAbility(abilityController.Attack, attackButton, attackSound, 0.7f);
         
@@ -235,29 +246,52 @@ public class PlayerController : MonoBehaviour
 		if(!ability.canUse)
 			return;
 
-		// Make sure the correct key has been pressed
-		if(!Input.GetKeyDown(key))
-			return;
+        // For all abilites except attack and block
+        if ((ability != abilityController.Attack) & (ability != abilityController.Block))
+        {
+            // Make sure the correct key has been pressed
+            if (!Input.GetKeyDown(key))
+                return;
+        }
+        else if (!attack)
+        {
+            // for attack check if attack has been used
+            if (ability == abilityController.Attack)
+                return;
+            if (ability == abilityController.Block)
+            {
+                // Make sure the correct key has been pressed
+                if (!Input.GetKeyDown(key))
+                    return;
+            }
+        }
 
-        // Attack only interacts with block if the block is being placed
+
+        // OLD IMPLEMENTATION // Attack only interacts with block if the block is being placed
+        /*
         if (((key == attackButton | key == attackKey) & (ability == abilityController.Block)) & !abilityController.Block.placementActive)
+            return;
+*/
+        // Attack only interacts with block if the block is being placed
+        if (((attack) & (ability == abilityController.Block)) & !abilityController.Block.placementActive)
             return;
 
         // If the block is being placed
         if (abilityController.Block.placementActive)
         {
-            // If the attack button is pressed
-            if (key == attackButton | key == attackKey)
+            if (attack)
             {
                 // Cancel block placement
                 ability.UseAbility();
             }
-            // If the block button is pressed
-            else if (key == blockButton | key == blockKey)
+            // If the block button is pressed again
+            else if (key == blockButton | key == blockKey) 
             {
                 // Place the block
                 abilityController.Block.DropBlock();
             }
+            // If the attack is pressed
+            
         }
         else
         {

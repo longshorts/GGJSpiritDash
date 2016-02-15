@@ -37,9 +37,6 @@ public class BlockAbility : Ability
                 Destroy(placementObj);
                 placementObj = null;
             }
-
-            // Starts Cooldown for when the player doesn't even place the block
-            StartCooldown();
         }
         // If the ability has not been cast
         else
