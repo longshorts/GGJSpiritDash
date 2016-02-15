@@ -10,7 +10,7 @@ public class BlockAbility : Ability
 	public float spawnDistance = 8.0f;
     private GameObject placementObj;
 	private GameObject blockObj;
-    private bool placementActive = false;
+    public bool placementActive = false;
 	
 	void Start()
 	{

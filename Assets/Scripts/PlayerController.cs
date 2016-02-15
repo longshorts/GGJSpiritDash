@@ -97,10 +97,10 @@ public class PlayerController : MonoBehaviour
 				bombKey = KeyCode.Alpha4;
 				attackKey = KeyCode.Alpha5;
                 dropBlockButton = KeyCode.Alpha6;
-				freezeButton = KeyCode.Joystick1Button0;
-				dashButton = KeyCode.Joystick1Button1;
-				blockButton = KeyCode.Joystick1Button2;
-				bombButton = KeyCode.Joystick1Button3;
+				freezeButton = KeyCode.Joystick1Button2;    // X - Button
+				dashButton = KeyCode.Joystick1Button0;      // A - Button
+				blockButton = KeyCode.Joystick1Button3;     // Y - Button
+				bombButton = KeyCode.Joystick1Button1;      // B - Button
 				attackButton = KeyCode.Joystick1Button5;
                 dropBlockButton = KeyCode.Joystick1Button4;
 				break;
@@ -116,11 +116,11 @@ public class PlayerController : MonoBehaviour
                 dropBlockKey = KeyCode.Alpha7;
 				blockKey = KeyCode.Minus;
 				bombKey = KeyCode.Equals;
-				freezeButton = KeyCode.Joystick2Button0;
-				dashButton = KeyCode.Joystick2Button1;
-				blockButton = KeyCode.Joystick2Button2;
-				bombButton = KeyCode.Joystick2Button3;
-				attackButton = KeyCode.Joystick2Button5;
+				freezeButton = KeyCode.Joystick2Button2;    // X - Button
+                dashButton = KeyCode.Joystick2Button0;      // A - Button
+                blockButton = KeyCode.Joystick2Button3;     // Y - Button
+                bombButton = KeyCode.Joystick2Button1;      // B - Button
+                attackButton = KeyCode.Joystick2Button5;
                 dropBlockButton = KeyCode.Joystick2Button4;
 				break;
 			
@@ -215,7 +215,7 @@ public class PlayerController : MonoBehaviour
 		CastAbility(abilityController.Freeze, freezeKey, freezeSound, 0.7f);
 		CastAbility(abilityController.Dash, dashKey, dashSound, 0.7f);
 		CastAbility(abilityController.Block, blockKey, blockSound, 0.7f);
-        CastAbility(abilityController.Block, dropBlockKey, blockSound, 0.7f);
+        CastAbility(abilityController.Block, attackKey, blockSound, 0.7f);
         CastAbility(abilityController.Bomb, bombKey, bombSound, 0.7f);
 		CastAbility(abilityController.Attack, attackKey, attackSound, 0.7f);
 
@@ -223,7 +223,7 @@ public class PlayerController : MonoBehaviour
 		CastAbility(abilityController.Freeze, freezeButton, freezeSound, 0.7f);
 		CastAbility(abilityController.Dash, dashButton, dashSound, 0.7f);
 		CastAbility(abilityController.Block, blockButton, blockSound, 0.7f);
-        CastAbility(abilityController.Block, dropBlockButton, blockSound, 0.7f);
+        CastAbility(abilityController.Block, attackButton, blockSound, 0.7f);
         CastAbility(abilityController.Bomb, bombButton, bombSound, 0.7f);
 		CastAbility(abilityController.Attack, attackButton, attackSound, 0.7f);
         
@@ -239,11 +239,25 @@ public class PlayerController : MonoBehaviour
 		if(!Input.GetKeyDown(key))
 			return;
 
-        // If the button pressed was the drop block button
-        if (key == dropBlockButton | key == dropBlockKey)
+        // Attack only interacts with block if the block is being placed
+        if (((key == attackButton | key == attackKey) & (ability == abilityController.Block)) & !abilityController.Block.placementActive)
+            return;
+
+        // If the block is being placed
+        if (abilityController.Block.placementActive)
         {
-            // Drop the block
-            abilityController.Block.DropBlock();
+            // If the attack button is pressed
+            if (key == attackButton | key == attackKey)
+            {
+                // Cancel block placement
+                ability.UseAbility();
+            }
+            // If the block button is pressed
+            else if (key == blockButton | key == blockKey)
+            {
+                // Place the block
+                abilityController.Block.DropBlock();
+            }
         }
         else
         {
