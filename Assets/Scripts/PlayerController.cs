@@ -279,18 +279,19 @@ public class PlayerController : MonoBehaviour
         // If the block is being placed
         if (abilityController.Block.placementActive)
         {
+            if (attack)
+            {
+                // Cancel block placement
+                ability.UseAbility();
+            }
             // If the block button is pressed again
-            if (key == blockButton | key == blockKey) 
+            else if (key == blockButton | key == blockKey) 
             {
                 // Place the block
                 abilityController.Block.DropBlock();
             }
             // If the attack is pressed
-            else if (attack)
-            {
-                // Cancel block placement
-                ability.UseAbility();
-            }
+            
         }
         else
         {
