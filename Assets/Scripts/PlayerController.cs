@@ -246,8 +246,8 @@ public class PlayerController : MonoBehaviour
 		if(!ability.canUse)
 			return;
 
-        // For all abilites except attack
-        if (ability != abilityController.Attack)
+        // For all abilites except attack and block
+        if ((ability != abilityController.Attack) & (ability != abilityController.Block))
         {
             // Make sure the correct key has been pressed
             if (!Input.GetKeyDown(key))
@@ -256,7 +256,14 @@ public class PlayerController : MonoBehaviour
         else if (!attack)
         {
             // for attack check if attack has been used
-            return;
+            if (ability == abilityController.Attack)
+                return;
+            if (ability == abilityController.Block)
+            {
+                // Make sure the correct key has been pressed
+                if (!Input.GetKeyDown(key))
+                    return;
+            }
         }
 
 
