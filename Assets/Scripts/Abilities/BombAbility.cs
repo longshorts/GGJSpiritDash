@@ -6,7 +6,6 @@ public class BombAbility : Ability
 	[Header("Spell Specific")]
 	public GameObject BombPrefab;
 	public float BombSpeed = 15.0f;
-	public float bombDist;
 
 	private Animator animator;
 	
