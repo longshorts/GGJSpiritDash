@@ -19,7 +19,7 @@ public class BlockAbility : Ability
 	
 	public override void CastAbility ()
 	{
-		Debug.Log ("Block Cast");
+		//Debug.Log ("Block Cast");
 		
         // If the ability has already been cast
         if (placementActive)
@@ -53,7 +53,7 @@ public class BlockAbility : Ability
     {
         if (placementActive)
         {
-            Debug.Log("Place Block");
+            //Debug.Log("Place Block");
 
             // Place the Block
             StartCoroutine(PlaceBlock());
@@ -77,7 +77,7 @@ public class BlockAbility : Ability
         }
         else
         {
-            Debug.Log("Block Placement not started");
+            //Debug.Log("Block Placement not started");
         }
     }
 

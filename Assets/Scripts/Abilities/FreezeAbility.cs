@@ -62,7 +62,7 @@ public class FreezeAbility : Ability
 
 	public override void CastAbility ()
 	{
-		Debug.Log ("Cast Freeze");
+		//Debug.Log ("Cast Freeze");
 
 		// Initialise animation
 		freezeFrame = 0.0f;
@@ -97,7 +97,7 @@ public class FreezeAbility : Ability
 			// Check if we have finished
 			if(sphereCollider.radius.Equals(freezeRadius))
 			{
-				Debug.Log("Finished");
+				//Debug.Log("Finished");
 				break;
 			}
 

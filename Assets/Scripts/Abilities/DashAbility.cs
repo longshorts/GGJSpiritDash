@@ -34,13 +34,13 @@ public class DashAbility : Ability
 	{
 		if(isDashing)
 		{
-			Debug.Log ("Already dashing");
+			//Debug.Log ("Already dashing");
 			return;
 		}
 
 		dashFrame = 0.0f;
 
-		Debug.Log ("Cast Dash");
+		//Debug.Log ("Cast Dash");
 		
 		// Freeze controls
 		playerController.LockControls(true);
@@ -128,7 +128,7 @@ public class DashAbility : Ability
 		playerController.LockControls(false);
 		rigidBody.isKinematic = false;
 
-		Debug.Log ("Finished");
+//		Debug.Log ("Finished");
 		yield return new WaitForEndOfFrame();
 	}
 }

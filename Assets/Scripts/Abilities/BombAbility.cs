@@ -17,7 +17,7 @@ public class BombAbility : Ability
 		
 	public override void CastAbility ()
 	{
-		Debug.Log ("Cast Bomb");
+		//Debug.Log ("Cast Bomb");
 
 		//Trigger player animation
 		animator.SetTrigger ("cast");

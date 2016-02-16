@@ -87,7 +87,7 @@ public class AttackAbility : Ability
 				// Check if we hit the player
 				if(hit.collider.gameObject.tag == oppositionTarget.tag)
 				{
-					Debug.Log ("Found player");
+					//Debug.Log ("Found player");
 					// Attack player
 					oppositionTarget.GetComponent<PlayerController>().Kill ();
 				}

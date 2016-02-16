@@ -69,7 +69,7 @@ public class Shrine : MonoBehaviour
 
 		if(ownerState == CaptureState.PLAYERONE)
 		{
-			Debug.Log ("Player One Capture!");
+			//Debug.Log ("Player One Capture!");
 			Percentage = CalculatePercentage(captureProgress, 0, 50);
 
 			// We already own so just continue lerping until
@@ -77,7 +77,7 @@ public class Shrine : MonoBehaviour
 		}
 		else if(ownerState == CaptureState.PLAYERTWO)
 		{
-			Debug.Log ("Player Two Capture!");
+			//Debug.Log ("Player Two Capture!");
 			Percentage = CalculatePercentage(captureProgress, 102, 151);
 
 			captureColor = Color.Lerp(NeutralColor, PlayerTwoColor, Percentage);
@@ -175,7 +175,7 @@ public class Shrine : MonoBehaviour
 
 	void OnTriggerExit(Collider other)
 	{
-		Debug.Log ("Exit!");
+		//Debug.Log ("Exit!");
 		currentCapturer = null;
 	}
 

@@ -5,7 +5,7 @@ public class Bomb : MonoBehaviour
 {
 	[Header("Properties")]
 	public float explosionForce = 10.0f;
-	public float explosionRadius = 10.0f;
+	public float explosionRadius = 2.0f;
 	public Vector3 moveDirection3D;
 	public Vector3 moveDirection2D;
 	private Rigidbody rigidBody;
