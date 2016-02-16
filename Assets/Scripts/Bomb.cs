@@ -38,19 +38,19 @@ public class Bomb : MonoBehaviour
 			IsExploding = true;
 			rigidBody.velocity = new Vector3();
 			GetComponent<SphereCollider>().radius = explosionRadius;
-		
+
+			// Play Audio
+			audioSource.PlayOneShot(explodeSound, 0.7f);
+
 			// Wait for animation to finish then destroy
 			StartCoroutine(Explode());
 		}
 
 		// Loop through the colliders
 		if(collision.gameObject.tag == "Player1" || collision.gameObject.tag == "Player2")
-		{
-			// Play Audio
-			audioSource.PlayOneShot(explodeSound, 0.7f);
-			
+		{			
 			// Knockback the player
-			collision.gameObject.GetComponent<PlayerController>().Knockback(transform.position, explosionForce);
+			collision.gameObject.GetComponent<PlayerController>().Kill();
 		}
 	}
 

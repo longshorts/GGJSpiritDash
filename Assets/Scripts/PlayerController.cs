@@ -319,32 +319,6 @@ public class PlayerController : MonoBehaviour
 		directionVector2D = new Vector3(directionVector3D.x, directionVector3D.z, 0.0f);
 	}
 
-	public void Knockback(Vector3 position, float force)
-	{
-		//return;
-
-		Vector3 difference, direction;
-		float t, magnitude, maxPos, finalForce;
-
-		// Calculate difference between bomb explosion position and our position
-		difference = transform.position - position;
-
-		// Calculate direction and magnitude of the vector
-		direction = difference.normalized;
-		magnitude = difference.magnitude;
-
-		// Get the magitude of the explosion
-		maxPos = (direction*force).magnitude;
-
-		// Calculate how much to explode
-		t = (magnitude - 0) / (maxPos - 0);
-		t = Mathf.Clamp01(t);
-
-		finalForce = Mathf.Lerp(force, 0, t);
-
-		transform.position = transform.position + (direction*finalForce);
-	}
-
 	//Kills this player. Returns false if player already dead.
 	public bool Kill()
 	{
