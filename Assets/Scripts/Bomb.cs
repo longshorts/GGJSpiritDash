@@ -31,6 +31,9 @@ public class Bomb : MonoBehaviour
 
 	void OnTriggerEnter(Collider collision)
 	{
+		if(collision.gameObject.name.Contains("Shrine"))
+			return;
+		
 		if(!IsExploding)
 		{
 			// Trigger explosion
