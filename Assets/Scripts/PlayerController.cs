@@ -60,7 +60,6 @@ public class PlayerController : MonoBehaviour
 
 	void Start ()
 	{
-
         // Access components
 		abilityController = GetComponent<AbilityController>();
 		audioSource = GetComponent<AudioSource> ();
@@ -234,7 +233,6 @@ public class PlayerController : MonoBehaviour
 		CastAbility(abilityController.Freeze, freezeButton, freezeSound, 0.7f);
 		CastAbility(abilityController.Dash, dashButton, dashSound, 0.7f);
 		CastAbility(abilityController.Block, blockButton, blockSound, 0.7f);
-        //CastAbility(abilityController.Block, attackButton, blockSound, 0.7f);
         CastAbility(abilityController.Bomb, bombButton, bombSound, 0.7f);
 		CastAbility(abilityController.Attack, attackButton, attackSound, 0.7f);
         
@@ -266,12 +264,6 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-
-        // OLD IMPLEMENTATION // Attack only interacts with block if the block is being placed
-        /*
-        if (((key == attackButton | key == attackKey) & (ability == abilityController.Block)) & !abilityController.Block.placementActive)
-            return;
-*/
         // Attack only interacts with block if the block is being placed
         if (((attack) & (ability == abilityController.Block)) & !abilityController.Block.placementActive)
             return;
@@ -327,9 +319,8 @@ public class PlayerController : MonoBehaviour
 			isAlive = false;
 			animator.SetBool ("dead", true);
 			respawnTimer = 0.0f;
-			//GetComponent<Renderer>().enabled = isAlive;
-			//GetComponent<Animator>().enabled = isAlive;
 			GetComponent<Collider>().enabled = isAlive;
+            rigidBody.velocity = Vector3.zero;
 			return true;
 		}
 		else
@@ -359,8 +350,6 @@ public class PlayerController : MonoBehaviour
         // Reset player allowing thme to move
         isAlive = true;
 		animator.SetBool ("dead", false);
-		//GetComponent<Renderer>().enabled = isAlive;
-		//GetComponent<Animator>().enabled = isAlive;
 		GetComponent<Collider>().enabled = isAlive;
 	}
 

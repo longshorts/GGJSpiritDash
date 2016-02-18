@@ -70,6 +70,9 @@ public class Portal : MonoBehaviour
 		// Don't try activating again
 		if(isActivated)
 			return;
+
+		if(isOpened)
+			return;
 		
 		// Activate the portal parts
 		foreach(GameObject obj in portalParts)
@@ -96,6 +99,9 @@ public class Portal : MonoBehaviour
 	{
 		// Don't try activating again
 		if(!isActivated)
+			return;
+
+		if(!isOpened)
 			return;
 		
 		// Flag its been opened

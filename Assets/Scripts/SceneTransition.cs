@@ -30,6 +30,7 @@ public class SceneTransition : MonoBehaviour
 		// Clear all prefs if we have them
 		if(PlayerPrefs.HasKey("RoundNo"))
 		{
+			Debug.Log("Clearing prefs!");
 			PlayerPrefs.DeleteAll();
 		}
 	}

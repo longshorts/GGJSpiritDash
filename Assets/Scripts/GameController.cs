@@ -32,6 +32,9 @@ public class GameController : MonoBehaviour
 		// Get a list of respawn points
 		gameRespawns = GameObject.FindGameObjectsWithTag("Respawn").ToList();
 
+		// Initialise round system
+		InitialiseRounds();
+
 		// Get a list of shrines and split them between the two players
 		InitialiseShrines();
 	}
@@ -71,11 +74,15 @@ public class GameController : MonoBehaviour
 				PlayerPrefs.SetInt("RoundNo", 1);
 				PlayerPrefs.SetInt("PlayerOneWins", 0);
 				PlayerPrefs.SetInt("PlayerTwoWins", 0);
+
+				Debug.Log("Reset rounds!");
 			}
 			else
 			{
 				// Increase round count
 				PlayerPrefs.SetInt("RoundNo", PlayerPrefs.GetInt("RoundNo") + 1);
+
+				Debug.Log("Next Round: " + PlayerPrefs.GetInt("RoundNo"));
 			}
 		}
 		else
@@ -84,9 +91,9 @@ public class GameController : MonoBehaviour
 			PlayerPrefs.SetInt("RoundNo", 1);
 			PlayerPrefs.SetInt("PlayerOneWins", 0);
 			PlayerPrefs.SetInt("PlayerTwoWins", 0);
-		}
 
-		Debug.Log ("Round : " + PlayerPrefs.GetInt("RoundNo"));
+			PlayerPrefs.GetInt("First Time Use!");
+		}
 	}
 
 	private void InitialiseShrines()
